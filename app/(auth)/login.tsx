@@ -11,17 +11,12 @@ import { Screen } from '../../components/Screen';
 import { Button } from '../../components/Button';
 import { Colors } from '../../constants/colors';
 
-export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [roleMode, setRoleMode] = useState<'CUSTOMER' | 'STAFF'>('CUSTOMER');
+export default function StaffLoginScreen() {
+  const [email, setEmail] = useState('rina.kusuma@nexabank.co.id');
+  const [password, setPassword] = useState('••••••••');
 
   const handleSignIn = () => {
-    if (roleMode === 'STAFF') {
-      router.replace('/(staff)/home');
-    } else {
-      router.replace('/(customer)/home');
-    }
+    router.replace('/(staff)/home');
   };
 
   return (
@@ -34,47 +29,9 @@ export default function LoginScreen() {
       </TouchableOpacity>
 
       <View style={styles.header}>
-        <Text style={styles.brandTitle}>NEXA BANK</Text>
-        <Text style={styles.title}>Sign In</Text>
-        <Text style={styles.subtitle}>
-          Access branch queues and live counter updates.
-        </Text>
-      </View>
-
-      <View style={styles.roleToggle}>
-        <TouchableOpacity
-          style={[
-            styles.roleOption,
-            roleMode === 'CUSTOMER' && styles.roleOptionActive,
-          ]}
-          onPress={() => setRoleMode('CUSTOMER')}
-        >
-          <Text
-            style={[
-              styles.roleText,
-              roleMode === 'CUSTOMER' && styles.roleTextActive,
-            ]}
-          >
-            Customer
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.roleOption,
-            roleMode === 'STAFF' && styles.roleOptionActive,
-          ]}
-          onPress={() => setRoleMode('STAFF')}
-        >
-          <Text
-            style={[
-              styles.roleText,
-              roleMode === 'STAFF' && styles.roleTextActive,
-            ]}
-          >
-            Staff
-          </Text>
-        </TouchableOpacity>
+        <Text style={styles.bankName}>NEXA BANK</Text>
+        <Text style={styles.title}>Welcome back</Text>
+        <Text style={styles.subtitle}>Sign in to QueueLess</Text>
       </View>
 
       <View style={styles.form}>
@@ -82,11 +39,7 @@ export default function LoginScreen() {
           <Text style={styles.label}>Email</Text>
           <TextInput
             style={styles.input}
-            placeholder={
-              roleMode === 'STAFF'
-                ? 'rina.kusuma@nexabank.co.id'
-                : 'wisnu@example.com'
-            }
+            placeholder="name@nexabank.co.id"
             placeholderTextColor={Colors.textLight}
             value={email}
             onChangeText={setEmail}
@@ -99,7 +52,7 @@ export default function LoginScreen() {
           <Text style={styles.label}>Password</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter your password"
+            placeholder="Enter password"
             placeholderTextColor={Colors.textLight}
             value={password}
             onChangeText={setPassword}
@@ -108,18 +61,11 @@ export default function LoginScreen() {
         </View>
 
         <Button
-          title={`Sign In as ${roleMode === 'STAFF' ? 'Staff' : 'Customer'}`}
+          title="SIGN IN"
           onPress={handleSignIn}
           size="lg"
           style={styles.submitBtn}
         />
-      </View>
-
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-          <Text style={styles.linkText}>Register</Text>
-        </TouchableOpacity>
       </View>
     </Screen>
   );
@@ -127,12 +73,14 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 12,
+    paddingTop: 16,
+    justifyContent: 'flex-start',
+    flexGrow: 1,
   },
   backButton: {
-    paddingVertical: 6,
+    paddingVertical: 8,
     alignSelf: 'flex-start',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   backButtonText: {
     fontSize: 14,
@@ -140,9 +88,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   header: {
-    marginBottom: 24,
+    marginBottom: 32,
   },
-  brandTitle: {
+  bankName: {
     fontSize: 11,
     fontWeight: '800',
     color: Colors.bankBlue,
@@ -156,36 +104,11 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: Colors.textSecondary,
   },
-  roleToggle: {
-    flexDirection: 'row',
-    backgroundColor: Colors.surfaceSubtle,
-    borderRadius: 10,
-    padding: 4,
-    marginBottom: 24,
-  },
-  roleOption: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: 'center',
-    borderRadius: 8,
-  },
-  roleOptionActive: {
-    backgroundColor: Colors.surface,
-  },
-  roleText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.textMuted,
-  },
-  roleTextActive: {
-    color: Colors.bankNavy,
-    fontWeight: '700',
-  },
   form: {
-    gap: 16,
+    gap: 18,
   },
   inputGroup: {
     gap: 6,
@@ -207,19 +130,5 @@ const styles = StyleSheet.create({
   },
   submitBtn: {
     marginTop: 8,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 32,
-  },
-  footerText: {
-    fontSize: 14,
-    color: Colors.textMuted,
-  },
-  linkText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.bankBlue,
   },
 });

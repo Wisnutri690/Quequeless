@@ -1,68 +1,68 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Screen } from '../../components/Screen';
 import { Button } from '../../components/Button';
 import { Colors } from '../../constants/colors';
-import {
-  MOCK_BRANCHES,
-  MOCK_ACTIVE_CUSTOMER_TICKET,
-  MOCK_TICKET_HISTORY,
-} from '../../constants/mockData';
-import { Branch, ServiceType } from '../../types';
+import { MOCK_BRANCHES } from '../../constants/mockData';
+import { ServiceType } from '../../types';
 
 export default function CustomerHomeScreen() {
-  const [modalStep, setModalStep] = useState<null | 'BRANCH' | 'SERVICE' | 'CONFIRM'>(null);
-  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
+  const params = useLocalSearchParams<{ branch?: string }>();
+
+  // Determine branch from QR scan parameter (default to Depok Branch)
+  const currentBranch =
+    MOCK_BRANCHES.find(
+      (b) =>
+        b.id === params.branch ||
+        b.id.toLowerCase().includes(params.branch?.toLowerCase() || '')
+    ) || MOCK_BRANCHES[0];
+
+  const [serviceModal, setServiceModal] = useState<null | 'SERVICE' | 'CONFIRM'>(null);
   const [selectedService, setSelectedService] = useState<ServiceType | null>(null);
-  const [hasActiveTicket, setHasActiveTicket] = useState(true);
-
-  const handleOpenBranchSelection = () => {
-    setSelectedBranch(null);
-    setSelectedService(null);
-    setModalStep('BRANCH');
-  };
-
-  const handleSelectBranch = (branch: Branch) => {
-    setSelectedBranch(branch);
-    setModalStep('SERVICE');
-  };
+  const [activeTicket, setActiveTicket] = useState<{
+    ticketNumber: string;
+    serviceName: string;
+    branchName: string;
+    peopleAhead: number;
+    wait: number;
+  } | null>({
+    ticketNumber: 'T-019',
+    serviceName: 'Teller',
+    branchName: currentBranch.shortName,
+    peopleAhead: 4,
+    wait: 20,
+  });
 
   const handleSelectService = (service: ServiceType) => {
     setSelectedService(service);
-    setModalStep('CONFIRM');
+    setServiceModal('CONFIRM');
   };
 
-  const handleConfirmQueue = () => {
-    setModalStep(null);
-    setHasActiveTicket(true);
+  const handleJoinQueue = () => {
+    setServiceModal(null);
+    setActiveTicket({
+      ticketNumber: selectedService === 'CUSTOMER_SERVICE' ? 'CS-019' : 'T-019',
+      serviceName:
+        selectedService === 'CUSTOMER_SERVICE' ? 'Customer Service' : 'Teller',
+      branchName: currentBranch.shortName,
+      peopleAhead: 4,
+      wait: selectedService === 'CUSTOMER_SERVICE' ? 20 : 15,
+    });
     router.push('/(customer)/queue');
-  };
-
-  const getEstimatedWait = () => {
-    if (!selectedBranch || !selectedService) return '~15 min';
-    const svc = selectedBranch.services.find((s) => s.type === selectedService);
-    return svc ? `~${svc.waitingCount * svc.avgWaitMinutes} min` : '~15 min';
   };
 
   return (
     <Screen contentContainerStyle={styles.container}>
-      {/* Header */}
+      {/* Header with Detected Branch */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.bankName}>NEXA BANK</Text>
-          <Text style={styles.greeting}>Good morning, Wisnu</Text>
-        </View>
-        <TouchableOpacity
-          style={styles.switchRoleBtn}
-          onPress={() => router.replace('/(staff)/home')}
-        >
-          <Text style={styles.switchRoleText}>Staff Portal ⇄</Text>
-        </TouchableOpacity>
+        <Text style={styles.bankName}>NEXA BANK</Text>
+        <Text style={styles.branchName}>{currentBranch.name}</Text>
+        <Text style={styles.branchAddress}>{currentBranch.address}</Text>
       </View>
 
       {/* Active Ticket Banner (if active) */}
-      {hasActiveTicket && (
+      {activeTicket && (
         <View style={styles.activeSection}>
           <Text style={styles.sectionLabel}>YOUR ACTIVE QUEUE</Text>
           <TouchableOpacity
@@ -70,15 +70,15 @@ export default function CustomerHomeScreen() {
             activeOpacity={0.8}
             onPress={() => router.push('/(customer)/queue')}
           >
-            <View style={styles.activeCardInfo}>
-              <Text style={styles.activeTicketNumber}>
-                {MOCK_ACTIVE_CUSTOMER_TICKET.ticketNumber}
+            <View>
+              <Text style={styles.activeTicketNum}>
+                {activeTicket.ticketNumber}
               </Text>
               <Text style={styles.activeService}>
-                {MOCK_ACTIVE_CUSTOMER_TICKET.serviceName} • {MOCK_ACTIVE_CUSTOMER_TICKET.branchName.replace('NEXA Bank — ', '')}
+                {activeTicket.serviceName} • {activeTicket.branchName}
               </Text>
               <Text style={styles.activeWait}>
-                {MOCK_ACTIVE_CUSTOMER_TICKET.peopleAhead} people ahead • ~{MOCK_ACTIVE_CUSTOMER_TICKET.estimatedWaitMinutes} min
+                {activeTicket.peopleAhead} people ahead • ~{activeTicket.wait} min
               </Text>
             </View>
             <Text style={styles.arrowIcon}>›</Text>
@@ -86,152 +86,106 @@ export default function CustomerHomeScreen() {
         </View>
       )}
 
-      {/* Primary Next Step CTA */}
-      <View style={styles.ctaBox}>
-        <Text style={styles.ctaSubtitle}>YOUR NEXT STEP</Text>
-        <Text style={styles.ctaTitle}>Take a queue ticket</Text>
+      {/* Primary Action Card */}
+      <View style={styles.ctaCard}>
+        <Text style={styles.ctaTitle}>Welcome to QueueLess</Text>
         <Text style={styles.ctaDesc}>
-          Join a branch queue digitally before your visit.
+          Take a digital queue ticket and avoid unnecessary waiting at the counter.
         </Text>
         <Button
-          title="Choose Branch"
+          title="TAKE A QUEUE TICKET"
           size="lg"
-          onPress={handleOpenBranchSelection}
-          style={styles.chooseBranchBtn}
+          onPress={() => setServiceModal('SERVICE')}
+          style={styles.takeBtn}
         />
       </View>
 
-      {/* Recent Activity (short) */}
-      <View style={styles.recentSection}>
-        <Text style={styles.sectionLabel}>RECENT ACTIVITY</Text>
-        {MOCK_TICKET_HISTORY.slice(0, 2).map((item) => (
-          <View key={item.id} style={styles.recentRow}>
-            <View>
-              <Text style={styles.recentTicket}>
-                {item.ticketNumber} • {item.serviceName}
-              </Text>
-              <Text style={styles.recentBranch}>
-                {item.branchName.replace('NEXA Bank — ', '')} • {item.completedAt}
-              </Text>
-            </View>
-            <Text style={styles.recentStatus}>{item.status}</Text>
-          </View>
-        ))}
+      {/* Exit / Rescan QR link */}
+      <View style={styles.bottomLinkArea}>
+        <TouchableOpacity onPress={() => router.replace('/')}>
+          <Text style={styles.rescanText}>Scan another branch QR</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Simplified Flow Modal */}
+      {/* Service Selection Modal (Branch is already detected) */}
       <Modal
-        visible={modalStep !== null}
+        visible={serviceModal !== null}
         transparent
         animationType="slide"
-        onRequestClose={() => setModalStep(null)}
+        onRequestClose={() => setServiceModal(null)}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            {/* Step 1: Choose Branch */}
-            {modalStep === 'BRANCH' && (
+            {serviceModal === 'SERVICE' && (
               <View>
-                <View style={styles.modalTop}>
-                  <Text style={styles.modalHeading}>Choose a branch</Text>
-                  <TouchableOpacity onPress={() => setModalStep(null)}>
-                    <Text style={styles.closeText}>Cancel</Text>
+                <View style={styles.modalHeader}>
+                  <View>
+                    <Text style={styles.modalBranchTag}>
+                      {currentBranch.name}
+                    </Text>
+                    <Text style={styles.modalHeading}>Choose a service</Text>
+                  </View>
+                  <TouchableOpacity onPress={() => setServiceModal(null)}>
+                    <Text style={styles.closeBtn}>Close</Text>
                   </TouchableOpacity>
                 </View>
-
-                <View style={styles.branchList}>
-                  {MOCK_BRANCHES.map((b) => (
-                    <TouchableOpacity
-                      key={b.id}
-                      style={styles.branchRow}
-                      onPress={() => handleSelectBranch(b)}
-                    >
-                      <View>
-                        <Text style={styles.branchTitle}>{b.name}</Text>
-                        <Text style={styles.branchAddress}>{b.address}</Text>
-                      </View>
-                      <Text style={styles.openTag}>Open</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {/* Step 2: Choose Service */}
-            {modalStep === 'SERVICE' && (
-              <View>
-                <View style={styles.modalTop}>
-                  <TouchableOpacity onPress={() => setModalStep('BRANCH')}>
-                    <Text style={styles.backText}>← Branches</Text>
-                  </TouchableOpacity>
-                  <Text style={styles.modalHeading}>Choose a service</Text>
-                  <TouchableOpacity onPress={() => setModalStep(null)}>
-                    <Text style={styles.closeText}>Cancel</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <Text style={styles.branchSelectedBanner}>
-                  {selectedBranch?.name}
-                </Text>
 
                 <View style={styles.serviceList}>
                   <TouchableOpacity
-                    style={styles.serviceRow}
+                    style={styles.serviceOption}
                     onPress={() => handleSelectService('TELLER')}
                   >
-                    <Text style={styles.serviceRowTitle}>Teller</Text>
-                    <Text style={styles.serviceRowDesc}>
-                      Cash, deposit, withdrawal, transfer
+                    <Text style={styles.serviceTitle}>Teller</Text>
+                    <Text style={styles.serviceDesc}>
+                      Cash deposits, withdrawals, and transfers.
                     </Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style={styles.serviceRow}
+                    style={styles.serviceOption}
                     onPress={() => handleSelectService('CUSTOMER_SERVICE')}
                   >
-                    <Text style={styles.serviceRowTitle}>Customer Service</Text>
-                    <Text style={styles.serviceRowDesc}>
-                      Account, ATM card, mobile banking
+                    <Text style={styles.serviceTitle}>Customer Service</Text>
+                    <Text style={styles.serviceDesc}>
+                      Account opening, ATM card, and mobile banking.
                     </Text>
                   </TouchableOpacity>
                 </View>
               </View>
             )}
 
-            {/* Step 3: Ready to Join Confirmation */}
-            {modalStep === 'CONFIRM' && (
+            {serviceModal === 'CONFIRM' && (
               <View>
-                <View style={styles.modalTop}>
-                  <TouchableOpacity onPress={() => setModalStep('SERVICE')}>
-                    <Text style={styles.backText}>← Services</Text>
+                <View style={styles.modalHeader}>
+                  <TouchableOpacity onPress={() => setServiceModal('SERVICE')}>
+                    <Text style={styles.backBtn}>← Services</Text>
                   </TouchableOpacity>
                   <Text style={styles.modalHeading}>Ready to join?</Text>
-                  <TouchableOpacity onPress={() => setModalStep(null)}>
-                    <Text style={styles.closeText}>Cancel</Text>
+                  <TouchableOpacity onPress={() => setServiceModal(null)}>
+                    <Text style={styles.closeBtn}>Close</Text>
                   </TouchableOpacity>
                 </View>
 
-                <View style={styles.confirmContent}>
-                  <View style={styles.confirmInfo}>
-                    <Text style={styles.confirmBranch}>
-                      {selectedBranch?.name}
-                    </Text>
-                    <Text style={styles.confirmService}>
-                      {selectedService === 'CUSTOMER_SERVICE'
-                        ? 'Customer Service'
-                        : 'Teller'}
-                    </Text>
+                <View style={styles.confirmBox}>
+                  <Text style={styles.confirmBranch}>{currentBranch.name}</Text>
+                  <Text style={styles.confirmService}>
+                    {selectedService === 'CUSTOMER_SERVICE'
+                      ? 'Customer Service'
+                      : 'Teller'}
+                  </Text>
 
-                    <View style={styles.waitBox}>
-                      <Text style={styles.waitLabel}>ESTIMATED WAIT</Text>
-                      <Text style={styles.waitValue}>{getEstimatedWait()}</Text>
-                    </View>
+                  <View style={styles.numberBox}>
+                    <Text style={styles.numberBoxLabel}>YOUR QUEUE NUMBER</Text>
+                    <Text style={styles.numberBoxValue}>
+                      {selectedService === 'CUSTOMER_SERVICE' ? 'CS-019' : 'T-019'}
+                    </Text>
                   </View>
 
                   <Button
-                    title="Take Queue Number"
+                    title="JOIN QUEUE"
                     size="lg"
-                    onPress={handleConfirmQueue}
-                    style={styles.takeQueueBtn}
+                    onPress={handleJoinQueue}
+                    style={styles.confirmBtn}
                   />
                 </View>
               </View>
@@ -246,41 +200,34 @@ export default function CustomerHomeScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 24,
+    justifyContent: 'space-between',
+    flexGrow: 1,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 28,
+    marginBottom: 24,
   },
   bankName: {
     fontSize: 11,
     fontWeight: '800',
     color: Colors.bankBlue,
     letterSpacing: 1.5,
+    marginBottom: 4,
   },
-  greeting: {
-    fontSize: 22,
+  branchName: {
+    fontSize: 24,
     fontWeight: '900',
     color: Colors.bankNavy,
+  },
+  branchAddress: {
+    fontSize: 13,
+    color: Colors.textMuted,
     marginTop: 2,
-  },
-  switchRoleBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: Colors.surfaceSubtle,
-  },
-  switchRoleText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.textSecondary,
   },
   activeSection: {
     marginBottom: 24,
   },
   sectionLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '800',
     color: Colors.textMuted,
     letterSpacing: 1,
@@ -291,21 +238,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: Colors.surface,
-    padding: 16,
+    padding: 18,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: Colors.border,
   },
-  activeCardInfo: {
-    flex: 1,
-  },
-  activeTicketNumber: {
-    fontSize: 20,
+  activeTicketNum: {
+    fontSize: 22,
     fontWeight: '900',
     color: Colors.bankNavy,
   },
   activeService: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
     color: Colors.text,
     marginTop: 2,
@@ -313,202 +257,145 @@ const styles = StyleSheet.create({
   activeWait: {
     fontSize: 12,
     color: Colors.textMuted,
-    marginTop: 2,
+    marginTop: 4,
   },
   arrowIcon: {
     fontSize: 22,
     color: Colors.textMuted,
-    marginLeft: 8,
   },
-  ctaBox: {
+  ctaCard: {
     backgroundColor: Colors.surface,
-    padding: 24,
     borderRadius: 16,
+    padding: 24,
     borderWidth: 1,
     borderColor: Colors.border,
     marginBottom: 28,
   },
-  ctaSubtitle: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: Colors.bankBlue,
-    letterSpacing: 1,
-    marginBottom: 4,
-  },
   ctaTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '900',
     color: Colors.bankNavy,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   ctaDesc: {
     fontSize: 14,
     color: Colors.textSecondary,
-    marginBottom: 20,
+    lineHeight: 20,
+    marginBottom: 24,
   },
-  chooseBranchBtn: {
+  takeBtn: {
     width: '100%',
   },
-  recentSection: {
-    marginTop: 4,
-  },
-  recentRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  bottomLinkArea: {
     alignItems: 'center',
+    marginTop: 'auto',
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
   },
-  recentTicket: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.text,
-  },
-  recentBranch: {
-    fontSize: 12,
-    color: Colors.textMuted,
-    marginTop: 2,
-  },
-  recentStatus: {
-    fontSize: 12,
+  rescanText: {
+    fontSize: 13,
+    color: Colors.bankBlue,
     fontWeight: '600',
-    color: Colors.textMuted,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(10, 25, 47, 0.4)',
+    backgroundColor: 'rgba(10, 25, 47, 0.5)',
     justifyContent: 'flex-end',
   },
   modalCard: {
     backgroundColor: Colors.background,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     padding: 24,
-    minHeight: 380,
+    minHeight: 400,
   },
-  modalTop: {
+  modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
+  },
+  modalBranchTag: {
+    fontSize: 11,
+    color: Colors.bankBlue,
+    fontWeight: '700',
+    marginBottom: 2,
   },
   modalHeading: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 20,
+    fontWeight: '900',
     color: Colors.bankNavy,
   },
-  closeText: {
+  closeBtn: {
     fontSize: 14,
     color: Colors.textMuted,
     fontWeight: '600',
   },
-  backText: {
+  backBtn: {
     fontSize: 14,
     color: Colors.bankBlue,
     fontWeight: '600',
-  },
-  branchList: {
-    gap: 10,
-    marginTop: 8,
-  },
-  branchRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: Colors.surface,
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  branchTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: Colors.bankNavy,
-  },
-  branchAddress: {
-    fontSize: 12,
-    color: Colors.textMuted,
-    marginTop: 2,
-  },
-  openTag: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#059669',
-  },
-  branchSelectedBanner: {
-    fontSize: 13,
-    color: Colors.bankBlue,
-    fontWeight: '700',
-    marginBottom: 12,
   },
   serviceList: {
     gap: 12,
-    marginTop: 8,
   },
-  serviceRow: {
-    backgroundColor: Colors.surface,
-    padding: 18,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  serviceRowTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: Colors.bankNavy,
-    marginBottom: 4,
-  },
-  serviceRowDesc: {
-    fontSize: 13,
-    color: Colors.textSecondary,
-  },
-  confirmContent: {
-    marginTop: 12,
-  },
-  confirmInfo: {
+  serviceOption: {
     backgroundColor: Colors.surface,
     padding: 20,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: Colors.border,
+  },
+  serviceTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: Colors.bankNavy,
+    marginBottom: 4,
+  },
+  serviceDesc: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    lineHeight: 18,
+  },
+  confirmBox: {
     alignItems: 'center',
-    marginBottom: 20,
+    paddingTop: 12,
   },
   confirmBranch: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 13,
     color: Colors.textMuted,
+    fontWeight: '600',
   },
   confirmService: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: Colors.bankNavy,
-    marginTop: 4,
-    marginBottom: 16,
-  },
-  waitBox: {
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: Colors.surfaceSubtle,
-    borderRadius: 10,
-    width: '100%',
-  },
-  waitLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: Colors.textMuted,
-    letterSpacing: 0.5,
-  },
-  waitValue: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '800',
     color: Colors.bankNavy,
     marginTop: 2,
+    marginBottom: 20,
   },
-  takeQueueBtn: {
+  numberBox: {
+    backgroundColor: Colors.surface,
+    paddingVertical: 20,
+    paddingHorizontal: 32,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 24,
+  },
+  numberBoxLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.textMuted,
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  numberBoxValue: {
+    fontSize: 44,
+    fontWeight: '900',
+    color: Colors.bankNavy,
+  },
+  confirmBtn: {
     width: '100%',
   },
 });

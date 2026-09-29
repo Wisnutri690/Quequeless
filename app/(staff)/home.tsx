@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { Screen } from '../../components/Screen';
 import { Button } from '../../components/Button';
@@ -9,25 +9,16 @@ export default function StaffHomeScreen() {
   return (
     <Screen contentContainerStyle={styles.container}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.bankName}>NEXA BANK</Text>
-          <Text style={styles.branchTitle}>Depok Branch</Text>
-        </View>
-        <TouchableOpacity
-          style={styles.switchPortalBtn}
-          onPress={() => router.replace('/(customer)/home')}
-        >
-          <Text style={styles.switchPortalText}>Customer Portal ⇄</Text>
-        </TouchableOpacity>
+        <Text style={styles.bankName}>NEXA BANK</Text>
+        <Text style={styles.branchTitle}>Depok Branch</Text>
       </View>
 
       <View style={styles.counterCard}>
         <Text style={styles.counterHeading}>Counter 03</Text>
-        <Text style={styles.counterSub}>Teller Station</Text>
 
         <View style={styles.statsRow}>
           <View style={styles.statBox}>
-            <Text style={styles.statLabel}>CURRENT</Text>
+            <Text style={styles.statLabel}>NOW SERVING</Text>
             <Text style={styles.statValueHighlight}>T-017</Text>
           </View>
 
@@ -40,7 +31,7 @@ export default function StaffHomeScreen() {
         </View>
 
         <Button
-          title="Open Counter"
+          title="OPEN COUNTER"
           size="lg"
           onPress={() => router.push('/(staff)/queue')}
           style={styles.openBtn}
@@ -57,9 +48,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
     marginBottom: 40,
   },
   bankName: {
@@ -67,23 +55,12 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: Colors.bankBlue,
     letterSpacing: 1.5,
+    marginBottom: 2,
   },
   branchTitle: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '900',
     color: Colors.bankNavy,
-    marginTop: 2,
-  },
-  switchPortalBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: Colors.surfaceSubtle,
-  },
-  switchPortalText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.textSecondary,
   },
   counterCard: {
     backgroundColor: Colors.surface,
@@ -98,13 +75,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '900',
     color: Colors.bankNavy,
-  },
-  counterSub: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.textMuted,
-    marginTop: 2,
-    marginBottom: 28,
+    marginBottom: 20,
   },
   statsRow: {
     flexDirection: 'row',

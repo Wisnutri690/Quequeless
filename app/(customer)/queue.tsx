@@ -8,19 +8,19 @@ import { Colors } from '../../constants/colors';
 import { QueueTicket } from '../../types';
 
 const INITIAL_TICKET: QueueTicket = {
-  id: 'ticket-t-018',
-  ticketNumber: 'T-018',
+  id: 'ticket-t-019',
+  ticketNumber: 'T-019',
   serviceType: 'TELLER',
   serviceName: 'Teller',
   branchId: 'branch-depok',
-  branchName: 'NEXA Bank — Depok',
-  customerId: 'cust-wisnu',
-  customerName: 'Wisnu Tri',
+  branchName: 'Depok Branch',
+  customerId: 'guest-session',
+  customerName: 'Customer',
   status: 'WAITING',
   counterName: 'Counter 03',
-  nowServingNumber: 'T-016',
-  peopleAhead: 2,
-  estimatedWaitMinutes: 10,
+  nowServingNumber: 'T-017',
+  peopleAhead: 4,
+  estimatedWaitMinutes: 20,
   createdAt: '09:45 AM',
 };
 
@@ -36,7 +36,6 @@ export default function CustomerQueueScreen() {
 
   return (
     <Screen contentContainerStyle={styles.container}>
-      {/* Header */}
       <View style={styles.topBar}>
         <Text style={styles.screenHeading}>My Ticket</Text>
       </View>
@@ -46,27 +45,29 @@ export default function CustomerQueueScreen() {
           {/* Main Number Display */}
           <View style={styles.ticketCenter}>
             <Text style={styles.ticketNumber}>{ticket.ticketNumber}</Text>
-            <Text style={styles.serviceName}>{ticket.serviceName}</Text>
-            <View style={styles.statusBadgeWrap}>
+            <Text style={styles.serviceAndBranch}>
+              {ticket.serviceName} • {ticket.branchName}
+            </Text>
+            <View style={styles.badgeWrap}>
               <StatusBadge status={ticket.status} />
             </View>
           </View>
 
-          {/* Dynamic Content based on Status */}
+          {/* Conditional Focus Area */}
           {isCalled ? (
             <View style={styles.calledBox}>
-              <Text style={styles.calledCounterLabel}>PLEASE PROCEED TO</Text>
-              <Text style={styles.calledCounterName}>
+              <Text style={styles.calledNotice}>PLEASE PROCEED TO</Text>
+              <Text style={styles.counterTitle}>
                 {ticket.counterName || 'Counter 03'}
               </Text>
-              <Text style={styles.calledPrompt}>
-                Please step forward to the counter.
+              <Text style={styles.calledInstruction}>
+                Please proceed to {ticket.counterName || 'Counter 03'}.
               </Text>
             </View>
           ) : isServing ? (
             <View style={styles.servingBox}>
-              <Text style={styles.servingCounterLabel}>IN SERVICE AT</Text>
-              <Text style={styles.servingCounterName}>
+              <Text style={styles.servingLabel}>CURRENTLY SERVING AT</Text>
+              <Text style={styles.servingCounter}>
                 {ticket.counterName || 'Counter 03'}
               </Text>
             </View>
@@ -74,28 +75,28 @@ export default function CustomerQueueScreen() {
             <View style={styles.waitingMetrics}>
               <View style={styles.metricItem}>
                 <Text style={styles.metricLabel}>PEOPLE AHEAD</Text>
-                <Text style={styles.metricValue}>{ticket.peopleAhead}</Text>
+                <Text style={styles.metricVal}>{ticket.peopleAhead}</Text>
               </View>
 
               <View style={styles.metricDivider} />
 
               <View style={styles.metricItem}>
                 <Text style={styles.metricLabel}>ESTIMATED WAIT</Text>
-                <Text style={styles.metricValue}>
-                  ~{ticket.estimatedWaitMinutes} min
+                <Text style={styles.metricVal}>
+                  {ticket.estimatedWaitMinutes} min
                 </Text>
               </View>
 
               <View style={styles.metricDivider} />
 
               <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>COUNTER</Text>
-                <Text style={styles.metricValue}>—</Text>
+                <Text style={styles.metricLabel}>STATUS</Text>
+                <Text style={styles.metricVal}>WAITING</Text>
               </View>
             </View>
           )}
 
-          {/* Primary Action Button (Cancel queue only when waiting) */}
+          {/* Action button */}
           {ticket.status === 'WAITING' && (
             <Button
               title="Cancel Queue"
@@ -106,27 +107,21 @@ export default function CustomerQueueScreen() {
             />
           )}
 
-          {/* Subtle Simulation Controls for Review */}
-          <View style={styles.simulatorRow}>
-            <Text style={styles.simLabel}>Demo state:</Text>
+          {/* State Switcher for Verification */}
+          <View style={styles.stateSwitcher}>
             <TouchableOpacity
               onPress={() =>
                 setTicket((prev) =>
                   prev
-                    ? {
-                        ...prev,
-                        status: 'WAITING',
-                        peopleAhead: 2,
-                        estimatedWaitMinutes: 10,
-                      }
+                    ? { ...prev, status: 'WAITING', peopleAhead: 4, estimatedWaitMinutes: 20 }
                     : INITIAL_TICKET
                 )
               }
             >
               <Text
                 style={[
-                  styles.simPill,
-                  ticket.status === 'WAITING' && styles.simPillActive,
+                  styles.switchPill,
+                  ticket.status === 'WAITING' && styles.switchPillActive,
                 ]}
               >
                 Waiting
@@ -137,20 +132,15 @@ export default function CustomerQueueScreen() {
               onPress={() =>
                 setTicket((prev) =>
                   prev
-                    ? {
-                        ...prev,
-                        status: 'CALLED',
-                        counterName: 'Counter 03',
-                        peopleAhead: 0,
-                      }
+                    ? { ...prev, status: 'CALLED', counterName: 'Counter 03' }
                     : null
                 )
               }
             >
               <Text
                 style={[
-                  styles.simPill,
-                  ticket.status === 'CALLED' && styles.simPillActive,
+                  styles.switchPill,
+                  ticket.status === 'CALLED' && styles.switchPillActive,
                 ]}
               >
                 Called
@@ -161,19 +151,15 @@ export default function CustomerQueueScreen() {
               onPress={() =>
                 setTicket((prev) =>
                   prev
-                    ? {
-                        ...prev,
-                        status: 'SERVING',
-                        counterName: 'Counter 03',
-                      }
+                    ? { ...prev, status: 'SERVING', counterName: 'Counter 03' }
                     : null
                 )
               }
             >
               <Text
                 style={[
-                  styles.simPill,
-                  ticket.status === 'SERVING' && styles.simPillActive,
+                  styles.switchPill,
+                  ticket.status === 'SERVING' && styles.switchPillActive,
                 ]}
               >
                 Serving
@@ -181,15 +167,15 @@ export default function CustomerQueueScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => setTicket(null)}>
-              <Text style={styles.simPill}>Empty</Text>
+              <Text style={styles.switchPill}>Clear</Text>
             </TouchableOpacity>
           </View>
         </View>
       ) : (
         <View style={styles.emptyView}>
           <Text style={styles.emptyTitle}>No active ticket</Text>
-          <Text style={styles.emptySub}>
-            Take a queue ticket when you are ready to visit.
+          <Text style={styles.emptySubtitle}>
+            Scan a branch QR or take a queue ticket when you arrive.
           </Text>
           <Button
             title="Take Queue Ticket"
@@ -197,12 +183,6 @@ export default function CustomerQueueScreen() {
             onPress={() => router.push('/(customer)/home')}
             style={styles.takeTicketBtn}
           />
-          <TouchableOpacity
-            style={{ marginTop: 24 }}
-            onPress={() => setTicket(INITIAL_TICKET)}
-          >
-            <Text style={styles.restoreText}>Restore Sample Ticket</Text>
-          </TouchableOpacity>
         </View>
       )}
     </Screen>
@@ -215,7 +195,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   topBar: {
-    marginBottom: 32,
+    marginBottom: 28,
   },
   screenHeading: {
     fontSize: 24,
@@ -225,7 +205,6 @@ const styles = StyleSheet.create({
   ticketWrapper: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingBottom: 16,
   },
   ticketCenter: {
     alignItems: 'center',
@@ -242,15 +221,15 @@ const styles = StyleSheet.create({
     color: Colors.bankNavy,
     letterSpacing: -1,
   },
-  serviceName: {
-    fontSize: 16,
+  serviceAndBranch: {
+    fontSize: 15,
     fontWeight: '600',
     color: Colors.textSecondary,
     marginTop: 4,
-    marginBottom: 14,
+    marginBottom: 12,
   },
-  statusBadgeWrap: {
-    marginTop: 4,
+  badgeWrap: {
+    marginTop: 2,
   },
   calledBox: {
     backgroundColor: Colors.bankBlue,
@@ -259,19 +238,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
-  calledCounterLabel: {
+  calledNotice: {
     fontSize: 11,
     fontWeight: '800',
     color: '#BFDBFE',
     letterSpacing: 1.5,
   },
-  calledCounterName: {
-    fontSize: 34,
+  counterTitle: {
+    fontSize: 36,
     fontWeight: '900',
     color: '#FFFFFF',
     marginVertical: 4,
   },
-  calledPrompt: {
+  calledInstruction: {
     fontSize: 14,
     color: '#EFF6FF',
     marginTop: 2,
@@ -279,20 +258,20 @@ const styles = StyleSheet.create({
   servingBox: {
     backgroundColor: Colors.surfaceSubtle,
     borderRadius: 16,
-    padding: 20,
+    padding: 24,
     alignItems: 'center',
     marginBottom: 24,
     borderWidth: 1,
     borderColor: Colors.border,
   },
-  servingCounterLabel: {
+  servingLabel: {
     fontSize: 10,
     fontWeight: '800',
     color: Colors.textMuted,
     letterSpacing: 1,
   },
-  servingCounterName: {
-    fontSize: 26,
+  servingCounter: {
+    fontSize: 28,
     fontWeight: '900',
     color: Colors.bankNavy,
     marginTop: 4,
@@ -318,7 +297,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     textAlign: 'center',
   },
-  metricValue: {
+  metricVal: {
     fontSize: 18,
     fontWeight: '800',
     color: Colors.bankNavy,
@@ -331,7 +310,7 @@ const styles = StyleSheet.create({
   cancelBtn: {
     marginBottom: 24,
   },
-  simulatorRow: {
+  stateSwitcher: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -339,21 +318,16 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     paddingTop: 16,
   },
-  simLabel: {
-    fontSize: 11,
-    color: Colors.textMuted,
-    marginRight: 4,
-  },
-  simPill: {
+  switchPill: {
     fontSize: 11,
     color: Colors.textSecondary,
     backgroundColor: Colors.surfaceSubtle,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: 6,
     fontWeight: '600',
   },
-  simPillActive: {
+  switchPillActive: {
     backgroundColor: Colors.bankNavy,
     color: '#FFFFFF',
   },
@@ -369,7 +343,7 @@ const styles = StyleSheet.create({
     color: Colors.bankNavy,
     marginBottom: 6,
   },
-  emptySub: {
+  emptySubtitle: {
     fontSize: 14,
     color: Colors.textMuted,
     textAlign: 'center',
@@ -377,10 +351,5 @@ const styles = StyleSheet.create({
   },
   takeTicketBtn: {
     minWidth: 200,
-  },
-  restoreText: {
-    fontSize: 13,
-    color: Colors.bankBlue,
-    fontWeight: '600',
   },
 });

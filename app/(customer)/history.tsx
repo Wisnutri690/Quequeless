@@ -1,38 +1,58 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Screen } from '../../components/Screen';
-import { StatusBadge } from '../../components/StatusBadge';
 import { Colors } from '../../constants/colors';
-import { MOCK_TICKET_HISTORY } from '../../constants/mockData';
+
+interface HistoryItem {
+  id: string;
+  ticketNumber: string;
+  service: string;
+  branch: string;
+  status: string;
+  time: string;
+}
+
+const HISTORY_DATA: HistoryItem[] = [
+  {
+    id: 'h-1',
+    ticketNumber: 'T-014',
+    service: 'Teller',
+    branch: 'Depok Branch',
+    status: 'Served',
+    time: '09:21',
+  },
+  {
+    id: 'h-2',
+    ticketNumber: 'CS-008',
+    service: 'Customer Service',
+    branch: 'Depok Branch',
+    status: 'Served',
+    time: '10:04',
+  },
+];
 
 export default function CustomerHistoryScreen() {
   return (
     <Screen contentContainerStyle={styles.container}>
       <Text style={styles.screenHeading}>History</Text>
 
-      {MOCK_TICKET_HISTORY.length > 0 ? (
-        <View style={styles.list}>
-          {MOCK_TICKET_HISTORY.map((item) => (
-            <View key={item.id} style={styles.historyRow}>
-              <View style={styles.leftInfo}>
-                <Text style={styles.ticketNum}>{item.ticketNumber}</Text>
-                <Text style={styles.serviceText}>{item.serviceName}</Text>
-                <Text style={styles.branchText}>
-                  {item.branchName.replace('NEXA Bank — ', '')}
-                </Text>
-              </View>
-
-              <View style={styles.rightInfo}>
-                <StatusBadge status={item.status} showDot={false} />
-              </View>
+      <View style={styles.list}>
+        {HISTORY_DATA.map((item) => (
+          <View key={item.id} style={styles.historyRow}>
+            <View style={styles.infoLeft}>
+              <Text style={styles.ticketNum}>{item.ticketNumber}</Text>
+              <Text style={styles.serviceText}>{item.service}</Text>
+              <Text style={styles.branchText}>{item.branch}</Text>
             </View>
-          ))}
-        </View>
-      ) : (
-        <View style={styles.emptyView}>
-          <Text style={styles.emptyTitle}>No past tickets</Text>
-        </View>
-      )}
+
+            <View style={styles.statusRight}>
+              <Text style={styles.statusText}>
+                {item.status} · {item.time}
+              </Text>
+            </View>
+          </View>
+        ))}
+      </View>
     </Screen>
   );
 }
@@ -63,11 +83,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: Colors.borderLight,
   },
-  leftInfo: {
+  infoLeft: {
     gap: 2,
   },
   ticketNum: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '900',
     color: Colors.bankNavy,
   },
@@ -80,15 +100,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.textMuted,
   },
-  rightInfo: {
+  statusRight: {
     alignItems: 'flex-end',
   },
-  emptyView: {
-    paddingVertical: 60,
-    alignItems: 'center',
-  },
-  emptyTitle: {
-    fontSize: 16,
-    color: Colors.textMuted,
+  statusText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#059669',
   },
 });

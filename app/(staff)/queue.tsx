@@ -12,7 +12,7 @@ interface QueueNumberItem {
 
 const INITIAL_QUEUE_LIST: QueueNumberItem[] = [
   { id: '1', ticketNumber: 'T-017', status: 'SERVING' },
-  { id: '2', ticketNumber: 'T-018', status: 'CALLED' },
+  { id: '2', ticketNumber: 'T-018', status: 'WAITING' },
   { id: '3', ticketNumber: 'T-019', status: 'WAITING' },
   { id: '4', ticketNumber: 'T-020', status: 'WAITING' },
   { id: '5', ticketNumber: 'T-021', status: 'WAITING' },
@@ -81,7 +81,7 @@ export default function StaffQueueScreen() {
           <Text style={styles.stationSub}>Teller Operations</Text>
         </View>
         <TouchableOpacity onPress={handleReset}>
-          <Text style={styles.resetText}>Reset List</Text>
+          <Text style={styles.resetText}>Reset</Text>
         </TouchableOpacity>
       </View>
 
@@ -102,7 +102,7 @@ export default function StaffQueueScreen() {
         )}
       </View>
 
-      {/* Next Up Section */}
+      {/* Next Section */}
       <View style={styles.nextSection}>
         <Text style={styles.sectionLabel}>NEXT</Text>
         <Text style={styles.nextNumber}>
@@ -137,7 +137,7 @@ export default function StaffQueueScreen() {
         )}
       </View>
 
-      {/* Waiting List Section */}
+      {/* Waiting Section */}
       <View style={styles.waitingSection}>
         <Text style={styles.sectionLabel}>WAITING ({waitingList.length})</Text>
 

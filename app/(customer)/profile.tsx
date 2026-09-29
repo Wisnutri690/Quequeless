@@ -4,10 +4,9 @@ import { router } from 'expo-router';
 import { Screen } from '../../components/Screen';
 import { Button } from '../../components/Button';
 import { Colors } from '../../constants/colors';
-import { MOCK_USER_PROFILE } from '../../constants/mockData';
 
 export default function CustomerProfileScreen() {
-  const handleSignOut = () => {
+  const handleExitSession = () => {
     router.replace('/');
   };
 
@@ -15,47 +14,19 @@ export default function CustomerProfileScreen() {
     <Screen contentContainerStyle={styles.container}>
       <Text style={styles.screenHeading}>Profile</Text>
 
-      {/* User Info Simple Box */}
-      <View style={styles.infoCard}>
-        <View style={styles.nameSection}>
-          <Text style={styles.userName}>{MOCK_USER_PROFILE.fullName}</Text>
-          <Text style={styles.userRole}>Customer</Text>
-        </View>
-
-        <View style={styles.divider} />
-
-        <View style={styles.itemRow}>
-          <Text style={styles.itemLabel}>Customer ID</Text>
-          <Text style={styles.itemValue}>
-            {MOCK_USER_PROFILE.customerReference || 'NXL-0001'}
-          </Text>
-        </View>
-
-        <View style={styles.itemRow}>
-          <Text style={styles.itemLabel}>Email</Text>
-          <Text style={styles.itemValue}>{MOCK_USER_PROFILE.email}</Text>
-        </View>
-
-        <View style={styles.itemRow}>
-          <Text style={styles.itemLabel}>Account Type</Text>
-          <Text style={styles.itemValue}>Individual Nasabah</Text>
-        </View>
+      <View style={styles.card}>
+        <Text style={styles.brandTitle}>QueueLess</Text>
+        <Text style={styles.sessionNotice}>
+          Your queue activity is stored for this session.
+        </Text>
       </View>
 
-      <View style={styles.actions}>
+      <View style={styles.actionArea}>
         <Button
-          title="Switch to Staff Portal"
+          title="Exit Session"
           variant="outline"
           size="md"
-          onPress={() => router.replace('/(staff)/home')}
-          style={styles.switchBtn}
-        />
-
-        <Button
-          title="Sign Out"
-          variant="danger"
-          size="md"
-          onPress={handleSignOut}
+          onPress={handleExitSession}
         />
       </View>
     </Screen>
@@ -74,52 +45,28 @@ const styles = StyleSheet.create({
     color: Colors.bankNavy,
     marginBottom: 24,
   },
-  infoCard: {
+  card: {
     backgroundColor: Colors.surface,
     borderRadius: 16,
-    padding: 24,
+    padding: 28,
     borderWidth: 1,
     borderColor: Colors.border,
-    marginBottom: 32,
+    alignItems: 'center',
+    marginBottom: 'auto',
   },
-  nameSection: {
-    marginBottom: 16,
-  },
-  userName: {
-    fontSize: 22,
+  brandTitle: {
+    fontSize: 24,
     fontWeight: '900',
     color: Colors.bankNavy,
+    marginBottom: 10,
   },
-  userRole: {
-    fontSize: 14,
-    color: Colors.bankBlue,
-    fontWeight: '600',
-    marginTop: 2,
+  sessionNotice: {
+    fontSize: 15,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
   },
-  divider: {
-    height: 1,
-    backgroundColor: Colors.borderLight,
-    marginBottom: 16,
-  },
-  itemRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-  },
-  itemLabel: {
-    fontSize: 14,
-    color: Colors.textMuted,
-  },
-  itemValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  actions: {
+  actionArea: {
     marginTop: 'auto',
-    gap: 12,
-  },
-  switchBtn: {
-    marginBottom: 4,
   },
 });

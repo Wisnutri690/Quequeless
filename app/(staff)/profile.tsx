@@ -46,14 +46,6 @@ export default function StaffProfileScreen() {
 
       <View style={styles.actions}>
         <Button
-          title="Switch to Customer View"
-          variant="outline"
-          size="md"
-          onPress={() => router.replace('/(customer)/home')}
-          style={styles.switchBtn}
-        />
-
-        <Button
           title="Sign Out"
           variant="danger"
           size="md"
@@ -120,8 +112,5 @@ const styles = StyleSheet.create({
   actions: {
     marginTop: 'auto',
     gap: 12,
-  },
-  switchBtn: {
-    marginBottom: 4,
   },
 });

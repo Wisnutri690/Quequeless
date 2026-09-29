@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Screen } from '../../components/Screen';
@@ -17,6 +17,12 @@ export default function CustomerHomeScreen() {
         b.id === params.branch ||
         b.id.toLowerCase().includes(params.branch?.toLowerCase() || '')
     ) || MOCK_BRANCHES[0];
+
+  useEffect(() => {
+    if (!params.branch) {
+      router.replace('/scan');
+    }
+  }, [params.branch]);
 
   const [serviceModal, setServiceModal] = useState<null | 'SERVICE' | 'CONFIRM'>(null);
   const [selectedService, setSelectedService] = useState<ServiceType | null>(null);
@@ -102,7 +108,7 @@ export default function CustomerHomeScreen() {
 
       {/* Exit / Rescan QR link */}
       <View style={styles.bottomLinkArea}>
-        <TouchableOpacity onPress={() => router.replace('/')}>
+        <TouchableOpacity onPress={() => router.replace('/scan')}>
           <Text style={styles.rescanText}>Scan another branch QR</Text>
         </TouchableOpacity>
       </View>

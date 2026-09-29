@@ -24,7 +24,14 @@
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow QueueLess to access your camera to scan branch QR codes.",
+          "barcodeScannerEnabled": true
+        }
+      ]
     ]
   }
 }

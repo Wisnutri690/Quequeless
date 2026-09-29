@@ -56,7 +56,7 @@ export interface UserProfile {
   email: string;
   role: UserRole;
   phone?: string;
-  cifNumber?: string; // Fictional Customer Identification File
+  customerReference?: string; // Fictional Customer Reference ID (e.g. NXL-0001)
 }
 
 export interface StaffProfile {

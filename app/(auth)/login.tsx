@@ -30,18 +30,18 @@ export default function LoginScreen() {
         style={styles.backButton}
         onPress={() => router.replace('/')}
       >
-        <Text style={styles.backButtonText}>← Back to NEXA Bank</Text>
+        <Text style={styles.backButtonText}>← Back</Text>
       </TouchableOpacity>
 
       <View style={styles.header}>
         <Text style={styles.brandTitle}>NEXA BANK</Text>
-        <Text style={styles.title}>Welcome back</Text>
+        <Text style={styles.title}>Sign In</Text>
         <Text style={styles.subtitle}>
-          Sign in to access your digital branch queues and real-time counter updates.
+          Access branch queues and live counter updates.
         </Text>
       </View>
 
-      <View style={styles.roleSelector}>
+      <View style={styles.roleToggle}>
         <TouchableOpacity
           style={[
             styles.roleOption,
@@ -55,7 +55,7 @@ export default function LoginScreen() {
               roleMode === 'CUSTOMER' && styles.roleTextActive,
             ]}
           >
-            Nasabah (Customer)
+            Customer
           </Text>
         </TouchableOpacity>
 
@@ -72,14 +72,14 @@ export default function LoginScreen() {
               roleMode === 'STAFF' && styles.roleTextActive,
             ]}
           >
-            Staff Cabang
+            Staff
           </Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.form}>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Email Address</Text>
+          <Text style={styles.label}>Email</Text>
           <TextInput
             style={styles.input}
             placeholder={
@@ -108,7 +108,7 @@ export default function LoginScreen() {
         </View>
 
         <Button
-          title={`Sign In as ${roleMode === 'STAFF' ? 'Staff Cabang' : 'Nasabah'}`}
+          title={`Sign In as ${roleMode === 'STAFF' ? 'Staff' : 'Customer'}`}
           onPress={handleSignIn}
           size="lg"
           style={styles.submitBtn}
@@ -118,7 +118,7 @@ export default function LoginScreen() {
       <View style={styles.footer}>
         <Text style={styles.footerText}>Don't have an account? </Text>
         <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-          <Text style={styles.linkText}>Register Nasabah</Text>
+          <Text style={styles.linkText}>Register</Text>
         </TouchableOpacity>
       </View>
     </Screen>
@@ -127,12 +127,12 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 10,
+    paddingTop: 12,
   },
   backButton: {
-    paddingVertical: 8,
+    paddingVertical: 6,
     alignSelf: 'flex-start',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   backButtonText: {
     fontSize: 14,
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   brandTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '800',
     color: Colors.bankBlue,
     letterSpacing: 1.5,
@@ -153,22 +153,18 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '900',
     color: Colors.bankNavy,
-    letterSpacing: -0.5,
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 14,
     color: Colors.textSecondary,
-    lineHeight: 20,
   },
-  roleSelector: {
+  roleToggle: {
     flexDirection: 'row',
     backgroundColor: Colors.surfaceSubtle,
-    borderRadius: 12,
+    borderRadius: 10,
     padding: 4,
     marginBottom: 24,
-    borderWidth: 1,
-    borderColor: Colors.border,
   },
   roleOption: {
     flex: 1,
@@ -178,10 +174,6 @@ const styles = StyleSheet.create({
   },
   roleOptionActive: {
     backgroundColor: Colors.surface,
-    shadowColor: '#0A192F',
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
   },
   roleText: {
     fontSize: 13,
@@ -207,15 +199,14 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.border,
-    borderRadius: 12,
+    borderRadius: 10,
     paddingHorizontal: 16,
-    paddingVertical: 13,
+    paddingVertical: 14,
     fontSize: 15,
     color: Colors.text,
   },
   submitBtn: {
     marginTop: 8,
-    backgroundColor: Colors.bankNavy,
   },
   footer: {
     flexDirection: 'row',

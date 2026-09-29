@@ -16,42 +16,42 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, showDot = true
           bg: Colors.statusWaiting.bg,
           text: Colors.statusWaiting.text,
           border: Colors.statusWaiting.border,
-          label: 'Waiting in Queue',
+          label: 'WAITING',
         };
       case 'CALLED':
         return {
           bg: Colors.statusCalled.bg,
           text: Colors.statusCalled.text,
           border: Colors.statusCalled.border,
-          label: 'Now Called',
+          label: 'CALLED',
         };
       case 'SERVING':
         return {
           bg: Colors.statusServing.bg,
           text: Colors.statusServing.text,
           border: Colors.statusServing.border,
-          label: 'In Service',
+          label: 'SERVING',
         };
       case 'SERVED':
         return {
           bg: Colors.statusServed.bg,
           text: Colors.statusServed.text,
           border: Colors.statusServed.border,
-          label: 'Served',
+          label: 'SERVED',
         };
       case 'CANCELLED':
         return {
           bg: Colors.statusSkipped.bg,
           text: Colors.statusSkipped.text,
           border: Colors.statusSkipped.border,
-          label: 'Cancelled',
+          label: 'CANCELLED',
         };
       case 'SKIPPED':
         return {
           bg: Colors.statusSkipped.bg,
           text: Colors.statusSkipped.text,
           border: Colors.statusSkipped.border,
-          label: 'Skipped',
+          label: 'SKIPPED',
         };
       default:
         return {

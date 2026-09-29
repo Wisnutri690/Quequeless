@@ -21,7 +21,7 @@ export const Colors = {
   textLight: '#94A3B8',
 
   // Action Buttons
-  primary: '#0A192F',
+  primary: '#1D4ED8', // Clean banking blue for primary actions
   primaryLight: '#EFF6FF',
   primaryAccent: '#1D4ED8',
 

@@ -3,129 +3,206 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import { Screen } from '../../components/Screen';
 import { Button } from '../../components/Button';
-import { QueueTicket } from '../../components/QueueTicket';
+import { StatusBadge } from '../../components/StatusBadge';
 import { Colors } from '../../constants/colors';
-import { MOCK_ACTIVE_CUSTOMER_TICKET } from '../../constants/mockData';
-import { QueueTicket as QueueTicketType } from '../../types';
+import { QueueTicket } from '../../types';
+
+const INITIAL_TICKET: QueueTicket = {
+  id: 'ticket-t-018',
+  ticketNumber: 'T-018',
+  serviceType: 'TELLER',
+  serviceName: 'Teller',
+  branchId: 'branch-depok',
+  branchName: 'NEXA Bank — Depok',
+  customerId: 'cust-wisnu',
+  customerName: 'Wisnu Tri',
+  status: 'WAITING',
+  counterName: 'Counter 03',
+  nowServingNumber: 'T-016',
+  peopleAhead: 2,
+  estimatedWaitMinutes: 10,
+  createdAt: '09:45 AM',
+};
 
 export default function CustomerQueueScreen() {
-  const [activeTicket, setActiveTicket] = useState<QueueTicketType | null>(
-    MOCK_ACTIVE_CUSTOMER_TICKET
-  );
+  const [ticket, setTicket] = useState<QueueTicket | null>(INITIAL_TICKET);
 
-  const handleCancelTicket = () => {
-    setActiveTicket(null);
-  };
+  const isCalled = ticket?.status === 'CALLED';
+  const isServing = ticket?.status === 'SERVING';
 
-  const handleSimulateCalled = () => {
-    if (!activeTicket) return;
-    setActiveTicket({
-      ...activeTicket,
-      status: 'CALLED',
-      counterName: 'COUNTER 02',
-      peopleAhead: 0,
-      estimatedWaitMinutes: 0,
-    });
-  };
-
-  const handleSimulateServing = () => {
-    if (!activeTicket) return;
-    setActiveTicket({
-      ...activeTicket,
-      status: 'SERVING',
-      counterName: 'COUNTER 02',
-      peopleAhead: 0,
-      estimatedWaitMinutes: 0,
-    });
-  };
-
-  const handleResetWaiting = () => {
-    setActiveTicket(MOCK_ACTIVE_CUSTOMER_TICKET);
+  const handleCancel = () => {
+    setTicket(null);
   };
 
   return (
     <Screen contentContainerStyle={styles.container}>
+      {/* Header */}
       <View style={styles.topBar}>
-        <View>
-          <Text style={styles.brandTitle}>NEXA BANK</Text>
-          <Text style={styles.screenTitle}>My Branch Queue</Text>
-          <Text style={styles.screenSubtitle}>
-            Real-time counter call and position tracking
-          </Text>
-        </View>
-
-        <TouchableOpacity
-          style={styles.demoToggle}
-          onPress={() =>
-            activeTicket ? handleCancelTicket() : handleResetWaiting()
-          }
-        >
-          <Text style={styles.demoToggleText}>
-            {activeTicket ? 'Simulate Empty' : 'Restore Ticket'}
-          </Text>
-        </TouchableOpacity>
+        <Text style={styles.screenHeading}>My Ticket</Text>
       </View>
 
-      {activeTicket ? (
-        <View style={styles.activeContainer}>
-          <QueueTicket
-            ticket={activeTicket}
-            onCancel={handleCancelTicket}
-          />
-
-          {/* Interactive Simulation Panel for Demo */}
-          <View style={styles.simulationCard}>
-            <Text style={styles.simTitle}>⚡ TEST COUNTER TRANSITION</Text>
-            <View style={styles.simButtonsRow}>
-              <Button
-                title="Simulate Called"
-                variant={activeTicket.status === 'CALLED' ? 'primary' : 'outline'}
-                size="sm"
-                onPress={handleSimulateCalled}
-                style={styles.simBtn}
-              />
-              <Button
-                title="In Service"
-                variant={activeTicket.status === 'SERVING' ? 'primary' : 'outline'}
-                size="sm"
-                onPress={handleSimulateServing}
-                style={styles.simBtn}
-              />
-              <Button
-                title="Reset Waiting"
-                variant="secondary"
-                size="sm"
-                onPress={handleResetWaiting}
-                style={styles.simBtn}
-              />
+      {ticket ? (
+        <View style={styles.ticketWrapper}>
+          {/* Main Number Display */}
+          <View style={styles.ticketCenter}>
+            <Text style={styles.ticketNumber}>{ticket.ticketNumber}</Text>
+            <Text style={styles.serviceName}>{ticket.serviceName}</Text>
+            <View style={styles.statusBadgeWrap}>
+              <StatusBadge status={ticket.status} />
             </View>
           </View>
 
-          {/* Guidance Info */}
-          <View style={styles.infoCard}>
-            <Text style={styles.infoTitle}>🏛️ Branch Visit Guidance</Text>
-            <Text style={styles.infoText}>
-              • Keep your ticket screen ready upon entering the branch.{'\n'}
-              • When your status turns to <Text style={{ fontWeight: '700', color: Colors.bankBlue }}>CALLED</Text>, immediately walk to your assigned counter.{'\n'}
-              • Please have your ID (KTP/Passport) and account details ready.
-            </Text>
+          {/* Dynamic Content based on Status */}
+          {isCalled ? (
+            <View style={styles.calledBox}>
+              <Text style={styles.calledCounterLabel}>PLEASE PROCEED TO</Text>
+              <Text style={styles.calledCounterName}>
+                {ticket.counterName || 'Counter 03'}
+              </Text>
+              <Text style={styles.calledPrompt}>
+                Please step forward to the counter.
+              </Text>
+            </View>
+          ) : isServing ? (
+            <View style={styles.servingBox}>
+              <Text style={styles.servingCounterLabel}>IN SERVICE AT</Text>
+              <Text style={styles.servingCounterName}>
+                {ticket.counterName || 'Counter 03'}
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.waitingMetrics}>
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>PEOPLE AHEAD</Text>
+                <Text style={styles.metricValue}>{ticket.peopleAhead}</Text>
+              </View>
+
+              <View style={styles.metricDivider} />
+
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>ESTIMATED WAIT</Text>
+                <Text style={styles.metricValue}>
+                  ~{ticket.estimatedWaitMinutes} min
+                </Text>
+              </View>
+
+              <View style={styles.metricDivider} />
+
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>COUNTER</Text>
+                <Text style={styles.metricValue}>—</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Primary Action Button (Cancel queue only when waiting) */}
+          {ticket.status === 'WAITING' && (
+            <Button
+              title="Cancel Queue"
+              variant="outline"
+              size="md"
+              onPress={handleCancel}
+              style={styles.cancelBtn}
+            />
+          )}
+
+          {/* Subtle Simulation Controls for Review */}
+          <View style={styles.simulatorRow}>
+            <Text style={styles.simLabel}>Demo state:</Text>
+            <TouchableOpacity
+              onPress={() =>
+                setTicket((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        status: 'WAITING',
+                        peopleAhead: 2,
+                        estimatedWaitMinutes: 10,
+                      }
+                    : INITIAL_TICKET
+                )
+              }
+            >
+              <Text
+                style={[
+                  styles.simPill,
+                  ticket.status === 'WAITING' && styles.simPillActive,
+                ]}
+              >
+                Waiting
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() =>
+                setTicket((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        status: 'CALLED',
+                        counterName: 'Counter 03',
+                        peopleAhead: 0,
+                      }
+                    : null
+                )
+              }
+            >
+              <Text
+                style={[
+                  styles.simPill,
+                  ticket.status === 'CALLED' && styles.simPillActive,
+                ]}
+              >
+                Called
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() =>
+                setTicket((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        status: 'SERVING',
+                        counterName: 'Counter 03',
+                      }
+                    : null
+                )
+              }
+            >
+              <Text
+                style={[
+                  styles.simPill,
+                  ticket.status === 'SERVING' && styles.simPillActive,
+                ]}
+              >
+                Serving
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setTicket(null)}>
+              <Text style={styles.simPill}>Empty</Text>
+            </TouchableOpacity>
           </View>
         </View>
       ) : (
-        <View style={styles.emptyContainer}>
-          <View style={styles.emptyIconCircle}>
-            <Text style={styles.emptyIcon}>🎫</Text>
-          </View>
-          <Text style={styles.emptyTitle}>No active branch queue</Text>
-          <Text style={styles.emptySubtitle}>
-            You currently do not have any active tickets. Select a NEXA Bank branch and join the queue before leaving home.
+        <View style={styles.emptyView}>
+          <Text style={styles.emptyTitle}>No active ticket</Text>
+          <Text style={styles.emptySub}>
+            Take a queue ticket when you are ready to visit.
           </Text>
           <Button
-            title="Browse Branches"
-            variant="primary"
+            title="Take Queue Ticket"
+            size="lg"
             onPress={() => router.push('/(customer)/home')}
-            style={styles.findBranchBtn}
+            style={styles.takeTicketBtn}
           />
+          <TouchableOpacity
+            style={{ marginTop: 24 }}
+            onPress={() => setTicket(INITIAL_TICKET)}
+          >
+            <Text style={styles.restoreText}>Restore Sample Ticket</Text>
+          </TouchableOpacity>
         </View>
       )}
     </Screen>
@@ -134,125 +211,176 @@ export default function CustomerQueueScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingBottom: 30,
+    paddingVertical: 24,
+    flexGrow: 1,
   },
   topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 18,
-    paddingTop: 8,
+    marginBottom: 32,
   },
-  brandTitle: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: Colors.bankBlue,
-    letterSpacing: 1.5,
-  },
-  screenTitle: {
-    fontSize: 22,
+  screenHeading: {
+    fontSize: 24,
     fontWeight: '900',
     color: Colors.bankNavy,
-    marginTop: 2,
   },
-  screenSubtitle: {
-    fontSize: 13,
-    color: Colors.textMuted,
-    marginTop: 2,
+  ticketWrapper: {
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingBottom: 16,
   },
-  demoToggle: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-    backgroundColor: Colors.surfaceSubtle,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  demoToggleText: {
-    fontSize: 11,
-    color: Colors.textSecondary,
-    fontWeight: '600',
-  },
-  activeContainer: {
-    gap: 12,
-  },
-  simulationCard: {
+  ticketCenter: {
+    alignItems: 'center',
+    paddingVertical: 36,
     backgroundColor: Colors.surface,
-    borderRadius: 14,
-    padding: 14,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginBottom: 24,
+  },
+  ticketNumber: {
+    fontSize: 64,
+    fontWeight: '900',
+    color: Colors.bankNavy,
+    letterSpacing: -1,
+  },
+  serviceName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    marginTop: 4,
+    marginBottom: 14,
+  },
+  statusBadgeWrap: {
+    marginTop: 4,
+  },
+  calledBox: {
+    backgroundColor: Colors.bankBlue,
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  calledCounterLabel: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#BFDBFE',
+    letterSpacing: 1.5,
+  },
+  calledCounterName: {
+    fontSize: 34,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    marginVertical: 4,
+  },
+  calledPrompt: {
+    fontSize: 14,
+    color: '#EFF6FF',
+    marginTop: 2,
+  },
+  servingBox: {
+    backgroundColor: Colors.surfaceSubtle,
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    marginBottom: 24,
     borderWidth: 1,
     borderColor: Colors.border,
   },
-  simTitle: {
+  servingCounterLabel: {
     fontSize: 10,
     fontWeight: '800',
     color: Colors.textMuted,
     letterSpacing: 1,
-    marginBottom: 10,
   },
-  simButtonsRow: {
+  servingCounterName: {
+    fontSize: 26,
+    fontWeight: '900',
+    color: Colors.bankNavy,
+    marginTop: 4,
+  },
+  waitingMetrics: {
     flexDirection: 'row',
-    gap: 8,
-  },
-  simBtn: {
-    flex: 1,
-  },
-  infoCard: {
     backgroundColor: Colors.surface,
     borderRadius: 14,
-    padding: 16,
+    paddingVertical: 18,
     borderWidth: 1,
     borderColor: Colors.border,
+    marginBottom: 24,
   },
-  infoTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.text,
+  metricItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  metricLabel: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: Colors.textMuted,
+    letterSpacing: 0.5,
     marginBottom: 6,
+    textAlign: 'center',
   },
-  infoText: {
-    fontSize: 13,
+  metricValue: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: Colors.bankNavy,
+  },
+  metricDivider: {
+    width: 1,
+    height: 28,
+    backgroundColor: Colors.border,
+  },
+  cancelBtn: {
+    marginBottom: 24,
+  },
+  simulatorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 'auto',
+    paddingTop: 16,
+  },
+  simLabel: {
+    fontSize: 11,
+    color: Colors.textMuted,
+    marginRight: 4,
+  },
+  simPill: {
+    fontSize: 11,
     color: Colors.textSecondary,
-    lineHeight: 20,
+    backgroundColor: Colors.surfaceSubtle,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    fontWeight: '600',
   },
-  emptyContainer: {
+  simPillActive: {
+    backgroundColor: Colors.bankNavy,
+    color: '#FFFFFF',
+  },
+  emptyView: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 20,
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    marginTop: 20,
-  },
-  emptyIconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: Colors.bankBlueLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  emptyIcon: {
-    fontSize: 28,
+    paddingVertical: 80,
   },
   emptyTitle: {
     fontSize: 20,
     fontWeight: '800',
     color: Colors.bankNavy,
-    marginBottom: 8,
+    marginBottom: 6,
   },
-  emptySubtitle: {
+  emptySub: {
     fontSize: 14,
     color: Colors.textMuted,
     textAlign: 'center',
-    lineHeight: 20,
     marginBottom: 24,
   },
-  findBranchBtn: {
-    minWidth: 180,
-    backgroundColor: Colors.bankNavy,
+  takeTicketBtn: {
+    minWidth: 200,
+  },
+  restoreText: {
+    fontSize: 13,
+    color: Colors.bankBlue,
+    fontWeight: '600',
   },
 });

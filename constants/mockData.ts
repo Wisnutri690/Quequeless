@@ -307,7 +307,7 @@ export const MOCK_USER_PROFILE: UserProfile = {
   email: 'wisnu@example.com',
   role: 'CUSTOMER',
   phone: '+62 812-3456-7890',
-  cifNumber: 'NX-89201472',
+  customerReference: 'NXL-0001',
 };
 
 export const MOCK_STAFF_PROFILE: StaffProfile = {

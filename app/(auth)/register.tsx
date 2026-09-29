@@ -14,7 +14,6 @@ import { Colors } from '../../constants/colors';
 export default function RegisterScreen() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
 
   const handleRegister = () => {
@@ -32,15 +31,15 @@ export default function RegisterScreen() {
 
       <View style={styles.header}>
         <Text style={styles.brandTitle}>NEXA BANK</Text>
-        <Text style={styles.title}>Register Nasabah</Text>
+        <Text style={styles.title}>Register</Text>
         <Text style={styles.subtitle}>
-          Create your digital queue profile to get instant access to branch queues.
+          Create an account to take branch queue tickets digitally.
         </Text>
       </View>
 
       <View style={styles.form}>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Full Name (According to KTP)</Text>
+          <Text style={styles.label}>Full Name</Text>
           <TextInput
             style={styles.input}
             placeholder="Wisnu Tri"
@@ -64,18 +63,6 @@ export default function RegisterScreen() {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Phone Number</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="+62 812-3456-7890"
-            placeholderTextColor={Colors.textLight}
-            value={phone}
-            onChangeText={setPhone}
-            keyboardType="phone-pad"
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
           <Text style={styles.label}>Password</Text>
           <TextInput
             style={styles.input}
@@ -88,7 +75,7 @@ export default function RegisterScreen() {
         </View>
 
         <Button
-          title="Create Nasabah Profile"
+          title="Create Account"
           onPress={handleRegister}
           size="lg"
           style={styles.submitBtn}
@@ -107,12 +94,12 @@ export default function RegisterScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 10,
+    paddingTop: 12,
   },
   backButton: {
-    paddingVertical: 8,
+    paddingVertical: 6,
     alignSelf: 'flex-start',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   backButtonText: {
     fontSize: 14,
@@ -120,10 +107,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   header: {
-    marginBottom: 26,
+    marginBottom: 24,
   },
   brandTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '800',
     color: Colors.bankBlue,
     letterSpacing: 1.5,
@@ -133,16 +120,14 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '900',
     color: Colors.bankNavy,
-    letterSpacing: -0.5,
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 14,
     color: Colors.textSecondary,
-    lineHeight: 20,
   },
   form: {
-    gap: 15,
+    gap: 16,
   },
   inputGroup: {
     gap: 6,
@@ -156,20 +141,19 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.border,
-    borderRadius: 12,
+    borderRadius: 10,
     paddingHorizontal: 16,
-    paddingVertical: 13,
+    paddingVertical: 14,
     fontSize: 15,
     color: Colors.text,
   },
   submitBtn: {
     marginTop: 8,
-    backgroundColor: Colors.bankNavy,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 30,
+    marginTop: 32,
   },
   footerText: {
     fontSize: 14,

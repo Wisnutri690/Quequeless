@@ -8,62 +8,47 @@ import { Colors } from '../constants/colors';
 export default function LandingScreen() {
   return (
     <Screen contentContainerStyle={styles.container}>
-      <View style={styles.heroSection}>
-        <View style={styles.bankBadge}>
-          <Text style={styles.bankBadgeText}>NEXA BANK DIGITAL SERVICES</Text>
-        </View>
-
+      <View style={styles.topSection}>
+        <Text style={styles.bankName}>NEXA BANK</Text>
         <Text style={styles.brandTitle}>QueueLess</Text>
         <Text style={styles.tagline}>
           Skip the waiting.{'\n'}Stay in control.
         </Text>
-
         <Text style={styles.description}>
-          Experience effortless branch banking. Take digital queue numbers for Teller and Customer Service from anywhere, track turns in real-time, and step forward right when your counter is ready.
+          Digital queue tickets for Teller and Customer Service. Monitor your turn in real time and step forward when your counter is ready.
         </Text>
       </View>
 
-      <View style={styles.featureHighlights}>
-        <View style={styles.featureCard}>
-          <Text style={styles.featureIcon}>💵</Text>
-          <View style={styles.featureInfo}>
-            <Text style={styles.featureTitle}>Teller Services (T-###)</Text>
-            <Text style={styles.featureDesc}>
-              Cash transactions, withdrawals, and interbank transfers
-            </Text>
-          </View>
+      <View style={styles.featuresList}>
+        <View style={styles.featureItem}>
+          <Text style={styles.featureDot}>•</Text>
+          <Text style={styles.featureText}>
+            Take branch tickets before you arrive
+          </Text>
         </View>
-
-        <View style={styles.featureCard}>
-          <Text style={styles.featureIcon}>👤</Text>
-          <View style={styles.featureInfo}>
-            <Text style={styles.featureTitle}>Customer Service (CS-###)</Text>
-            <Text style={styles.featureDesc}>
-              Account opening, cards, mobile banking, and consultations
-            </Text>
-          </View>
+        <View style={styles.featureItem}>
+          <Text style={styles.featureDot}>•</Text>
+          <Text style={styles.featureText}>
+            Real-time people ahead & wait estimates
+          </Text>
         </View>
-
-        <View style={styles.featureCard}>
-          <Text style={styles.featureIcon}>🏛️</Text>
-          <View style={styles.featureInfo}>
-            <Text style={styles.featureTitle}>Multi-Branch Coverage</Text>
-            <Text style={styles.featureDesc}>
-              Depok, Sudirman, and Bogor branch operations
-            </Text>
-          </View>
+        <View style={styles.featureItem}>
+          <Text style={styles.featureDot}>•</Text>
+          <Text style={styles.featureText}>
+            Clear counter call guidance
+          </Text>
         </View>
       </View>
 
       <View style={styles.actionSection}>
         <Button
-          title="Sign In to NEXA QueueLess"
+          title="Sign In"
           onPress={() => router.push('/(auth)/login')}
           size="lg"
           style={styles.mainBtn}
         />
 
-        <View style={styles.quickExploreRow}>
+        <View style={styles.rolePreviewRow}>
           <Button
             title="Customer View"
             variant="outline"
@@ -73,7 +58,7 @@ export default function LandingScreen() {
           />
           <View style={{ width: 10 }} />
           <Button
-            title="Branch Staff View"
+            title="Staff View"
             variant="outline"
             size="sm"
             onPress={() => router.push('/(staff)/home')}
@@ -89,29 +74,20 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     justifyContent: 'space-between',
-    paddingVertical: 24,
+    paddingVertical: 32,
   },
-  heroSection: {
-    marginTop: 16,
+  topSection: {
+    marginTop: 24,
   },
-  bankBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: Colors.bankBlueLight,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 20,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
-  },
-  bankBadgeText: {
-    color: Colors.bankBlue,
-    fontSize: 11,
+  bankName: {
+    fontSize: 12,
     fontWeight: '800',
-    letterSpacing: 1,
+    color: Colors.bankBlue,
+    letterSpacing: 2,
+    marginBottom: 8,
   },
   brandTitle: {
-    fontSize: 38,
+    fontSize: 40,
     fontWeight: '900',
     color: Colors.bankNavy,
     letterSpacing: -1,
@@ -125,50 +101,35 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   description: {
-    fontSize: 14,
+    fontSize: 15,
     color: Colors.textSecondary,
     lineHeight: 22,
   },
-  featureHighlights: {
-    marginVertical: 24,
+  featuresList: {
+    marginVertical: 32,
     gap: 12,
   },
-  featureCard: {
+  featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
-    padding: 16,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: Colors.border,
   },
-  featureIcon: {
-    fontSize: 26,
-    marginRight: 14,
+  featureDot: {
+    fontSize: 20,
+    color: Colors.bankBlue,
+    marginRight: 10,
   },
-  featureInfo: {
-    flex: 1,
-  },
-  featureTitle: {
-    fontSize: 15,
-    fontWeight: '700',
+  featureText: {
+    fontSize: 14,
     color: Colors.text,
-    marginBottom: 2,
-  },
-  featureDesc: {
-    fontSize: 12,
-    color: Colors.textMuted,
-    lineHeight: 16,
+    fontWeight: '500',
   },
   actionSection: {
     marginTop: 'auto',
-    paddingTop: 16,
   },
   mainBtn: {
     marginBottom: 12,
-    backgroundColor: Colors.bankNavy,
   },
-  quickExploreRow: {
+  rolePreviewRow: {
     flexDirection: 'row',
   },
   halfBtn: {

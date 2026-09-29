@@ -1,6 +1,6 @@
 export type UserRole = 'CUSTOMER' | 'STAFF';
 
-export type PlaceCategory = 'BARBER' | 'RESTAURANT';
+export type ServiceType = 'TELLER' | 'CUSTOMER_SERVICE';
 
 export type QueueStatus =
   | 'WAITING'
@@ -10,68 +10,63 @@ export type QueueStatus =
   | 'CANCELLED'
   | 'SKIPPED';
 
-export type OrderStatus =
-  | 'PENDING'
-  | 'PREPARING'
-  | 'ALMOST_READY'
-  | 'READY'
-  | 'PICKED_UP'
-  | 'CANCELLED';
+export interface BranchServiceInfo {
+  type: ServiceType;
+  name: string;
+  description: string;
+  waitingCount: number;
+  currentServingNumber: string;
+  avgWaitMinutes: number;
+}
 
-export interface Profile {
+export interface Branch {
+  id: string;
+  name: string;
+  shortName: string;
+  city: string;
+  address: string;
+  operatingHours: string;
+  isOpen: boolean;
+  services: BranchServiceInfo[];
+}
+
+export interface QueueTicket {
+  id: string;
+  ticketNumber: string; // e.g. 'CS-018', 'T-004'
+  serviceType: ServiceType;
+  serviceName: string; // 'Teller' or 'Customer Service'
+  branchId: string;
+  branchName: string;
+  customerId: string;
+  customerName: string;
+  status: QueueStatus;
+  counterName?: string; // e.g. 'Counter 02', 'Teller 01'
+  nowServingNumber: string; // e.g. 'CS-014'
+  peopleAhead: number;
+  estimatedWaitMinutes: number;
+  createdAt: string;
+  calledAt?: string;
+  servedAt?: string;
+  completedAt?: string;
+}
+
+export interface UserProfile {
   id: string;
   fullName: string;
   email: string;
   role: UserRole;
-  createdAt: string;
+  phone?: string;
+  cifNumber?: string; // Fictional Customer Identification File
 }
 
-export interface Place {
+export interface StaffProfile {
   id: string;
-  name: string;
-  category: PlaceCategory;
-  description: string;
-  address: string;
-  isActive: boolean;
-  averageServiceMinutes?: number;
-  currentWaitingCount?: number;
-  nowServingNumber?: number;
-}
-
-export interface QueueItem {
-  id: string;
-  placeId: string;
-  placeName: string;
-  customerId: string;
-  customerName: string;
-  queueNumber: number;
-  status: QueueStatus;
-  nowServingNumber: number;
-  peopleAhead: number;
-  estimatedWaitMinutes: number;
-  joinedAt: string;
-  calledAt?: string;
-  servedAt?: string;
-}
-
-export interface OrderFoodItem {
-  id: string;
-  name: string;
-  quantity: number;
-  price: number;
-}
-
-export interface OrderItem {
-  id: string;
-  placeId: string;
-  placeName: string;
-  customerId: string;
-  customerName: string;
-  orderNumber: string;
-  status: OrderStatus;
-  estimatedMinutes: number;
-  items: OrderFoodItem[];
-  createdAt: string;
-  readyAt?: string;
-  pickedUpAt?: string;
+  fullName: string;
+  email: string;
+  role: 'STAFF';
+  employeeId: string;
+  branchId: string;
+  branchName: string;
+  assignedService: ServiceType;
+  assignedCounter: string;
 }

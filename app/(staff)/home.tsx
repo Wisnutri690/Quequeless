@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { router } from 'expo-router';
-import { Screen } from '../../components/Screen';
-import { Button } from '../../components/Button';
-import { Colors } from '../../constants/colors';
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { router } from "expo-router";
+import { Screen } from "../../components/Screen";
+import { Button } from "../../components/Button";
+import { Colors } from "../../constants/colors";
 
 export default function StaffHomeScreen() {
   return (
@@ -15,7 +15,7 @@ export default function StaffHomeScreen() {
         </View>
         <TouchableOpacity
           style={styles.switchBadge}
-          onPress={() => router.replace('/(customer)/home')}
+          onPress={() => router.replace("/(customer)/home")}
         >
           <Text style={styles.switchBadgeText}>Customer View ⇄</Text>
         </TouchableOpacity>
@@ -68,7 +68,7 @@ export default function StaffHomeScreen() {
           title="Manage Barber Queue →"
           variant="primary"
           size="md"
-          onPress={() => router.push('/(staff)/queue')}
+          onPress={() => router.push("/(staff)/queue")}
         />
       </View>
 
@@ -96,18 +96,24 @@ export default function StaffHomeScreen() {
             <Text style={styles.metricSub}>in progress</Text>
           </View>
 
-          <View style={[styles.metricCard, { backgroundColor: '#FEF3C7' }]}>
-            <Text style={[styles.metricLabel, { color: '#92400E' }]}>
+          <View style={[styles.metricCard, { backgroundColor: "#FEF3C7" }]}>
+            <Text style={[styles.metricLabel, { color: "#92400E" }]}>
               PREPARING
             </Text>
-            <Text style={[styles.metricNum, { color: '#92400E' }]}>4</Text>
-            <Text style={[styles.metricSub, { color: '#92400E' }]}>cooking</Text>
+            <Text style={[styles.metricNum, { color: "#92400E" }]}>4</Text>
+            <Text style={[styles.metricSub, { color: "#92400E" }]}>
+              cooking
+            </Text>
           </View>
 
-          <View style={[styles.metricCard, { backgroundColor: '#D1FAE5' }]}>
-            <Text style={[styles.metricLabel, { color: '#065F46' }]}>READY</Text>
-            <Text style={[styles.metricNum, { color: '#065F46' }]}>2</Text>
-            <Text style={[styles.metricSub, { color: '#065F46' }]}>for pickup</Text>
+          <View style={[styles.metricCard, { backgroundColor: "#D1FAE5" }]}>
+            <Text style={[styles.metricLabel, { color: "#065F46" }]}>
+              READY
+            </Text>
+            <Text style={[styles.metricNum, { color: "#065F46" }]}>2</Text>
+            <Text style={[styles.metricSub, { color: "#065F46" }]}>
+              for pickup
+            </Text>
           </View>
         </View>
 
@@ -115,7 +121,7 @@ export default function StaffHomeScreen() {
           title="Manage Kitchen Orders →"
           variant="outline"
           size="md"
-          onPress={() => router.push('/(staff)/orders')}
+          onPress={() => router.push("/(staff)/orders")}
         />
       </View>
     </Screen>
@@ -127,22 +133,22 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
     paddingTop: 8,
   },
   greeting: {
     fontSize: 13,
     color: Colors.textMuted,
-    fontWeight: '600',
-    textTransform: 'uppercase',
+    fontWeight: "600",
+    textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   placeTitle: {
     fontSize: 22,
-    fontWeight: '800',
+    fontWeight: "800",
     color: Colors.text,
   },
   switchBadge: {
@@ -155,12 +161,12 @@ const styles = StyleSheet.create({
   },
   switchBadgeText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     color: Colors.primaryAccent,
   },
   overviewTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
     color: Colors.text,
     marginBottom: 14,
   },
@@ -176,8 +182,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   badgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     marginBottom: 6,
   },
@@ -189,32 +195,32 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: "700",
     color: Colors.textSecondary,
   },
   liveIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   liveDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#10B981',
+    backgroundColor: "#10B981",
     marginRight: 4,
   },
   liveText: {
     fontSize: 10,
-    fontWeight: '700',
-    color: '#059669',
+    fontWeight: "700",
+    color: "#059669",
   },
   cardTitle: {
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: "800",
     color: Colors.text,
   },
   metricsGrid: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
     marginBottom: 16,
   },
@@ -223,21 +229,21 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceSubtle,
     borderRadius: 12,
     padding: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   metricCardServing: {
     backgroundColor: Colors.primaryLight,
   },
   metricLabel: {
     fontSize: 9,
-    fontWeight: '800',
+    fontWeight: "800",
     color: Colors.textMuted,
     letterSpacing: 0.5,
     marginBottom: 2,
   },
   metricNum: {
     fontSize: 22,
-    fontWeight: '800',
+    fontWeight: "800",
     color: Colors.text,
   },
   metricSub: {

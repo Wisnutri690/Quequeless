@@ -15,7 +15,7 @@ export default function StaffTabsLayout() {
           paddingBottom: 8,
           paddingTop: 8,
         },
-        tabBarActiveTintColor: Colors.primaryAccent,
+        tabBarActiveTintColor: Colors.bankNavy,
         tabBarInactiveTintColor: Colors.textMuted,
         tabBarLabelStyle: {
           fontSize: 11,
@@ -26,28 +26,28 @@ export default function StaffTabsLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Staff Home',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>📋</Text>,
+          title: 'Branch Desk',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>🏛️</Text>,
         }}
       />
       <Tabs.Screen
         name="queue"
         options={{
-          title: 'Queue Ops',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>✂️</Text>,
+          title: 'Counter Ops',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>📢</Text>,
         }}
       />
       <Tabs.Screen
-        name="orders"
+        name="history"
         options={{
-          title: 'Order Ops',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>🍳</Text>,
+          title: 'Daily Logs',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>📋</Text>,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Staff Profile',
+          title: 'Operator',
           tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>🛡️</Text>,
         }}
       />

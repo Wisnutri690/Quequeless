@@ -30,13 +30,14 @@ export default function LoginScreen() {
         style={styles.backButton}
         onPress={() => router.replace('/')}
       >
-        <Text style={styles.backButtonText}>← Back</Text>
+        <Text style={styles.backButtonText}>← Back to NEXA Bank</Text>
       </TouchableOpacity>
 
       <View style={styles.header}>
+        <Text style={styles.brandTitle}>NEXA BANK</Text>
         <Text style={styles.title}>Welcome back</Text>
         <Text style={styles.subtitle}>
-          Sign in to manage your waiting queues and orders seamlessly.
+          Sign in to access your digital branch queues and real-time counter updates.
         </Text>
       </View>
 
@@ -54,7 +55,7 @@ export default function LoginScreen() {
               roleMode === 'CUSTOMER' && styles.roleTextActive,
             ]}
           >
-            Customer
+            Nasabah (Customer)
           </Text>
         </TouchableOpacity>
 
@@ -71,7 +72,7 @@ export default function LoginScreen() {
               roleMode === 'STAFF' && styles.roleTextActive,
             ]}
           >
-            Staff
+            Staff Cabang
           </Text>
         </TouchableOpacity>
       </View>
@@ -81,7 +82,11 @@ export default function LoginScreen() {
           <Text style={styles.label}>Email Address</Text>
           <TextInput
             style={styles.input}
-            placeholder="name@example.com"
+            placeholder={
+              roleMode === 'STAFF'
+                ? 'rina.kusuma@nexabank.co.id'
+                : 'wisnu@example.com'
+            }
             placeholderTextColor={Colors.textLight}
             value={email}
             onChangeText={setEmail}
@@ -103,7 +108,7 @@ export default function LoginScreen() {
         </View>
 
         <Button
-          title={`Sign In as ${roleMode === 'STAFF' ? 'Staff' : 'Customer'}`}
+          title={`Sign In as ${roleMode === 'STAFF' ? 'Staff Cabang' : 'Nasabah'}`}
           onPress={handleSignIn}
           size="lg"
           style={styles.submitBtn}
@@ -113,7 +118,7 @@ export default function LoginScreen() {
       <View style={styles.footer}>
         <Text style={styles.footerText}>Don't have an account? </Text>
         <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-          <Text style={styles.linkText}>Create account</Text>
+          <Text style={styles.linkText}>Register Nasabah</Text>
         </TouchableOpacity>
       </View>
     </Screen>
@@ -137,10 +142,17 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 24,
   },
+  brandTitle: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: Colors.bankBlue,
+    letterSpacing: 1.5,
+    marginBottom: 4,
+  },
   title: {
     fontSize: 28,
-    fontWeight: '800',
-    color: Colors.text,
+    fontWeight: '900',
+    color: Colors.bankNavy,
     letterSpacing: -0.5,
     marginBottom: 6,
   },
@@ -166,8 +178,8 @@ const styles = StyleSheet.create({
   },
   roleOptionActive: {
     backgroundColor: Colors.surface,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
+    shadowColor: '#0A192F',
+    shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
   },
@@ -177,7 +189,8 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
   },
   roleTextActive: {
-    color: Colors.text,
+    color: Colors.bankNavy,
+    fontWeight: '700',
   },
   form: {
     gap: 16,
@@ -202,6 +215,7 @@ const styles = StyleSheet.create({
   },
   submitBtn: {
     marginTop: 8,
+    backgroundColor: Colors.bankNavy,
   },
   footer: {
     flexDirection: 'row',
@@ -215,6 +229,6 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 14,
     fontWeight: '700',
-    color: Colors.primaryAccent,
+    color: Colors.bankBlue,
   },
 });

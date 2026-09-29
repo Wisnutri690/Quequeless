@@ -4,84 +4,159 @@ import { Screen } from '../../components/Screen';
 import { Button } from '../../components/Button';
 import { StatusBadge } from '../../components/StatusBadge';
 import { Colors } from '../../constants/colors';
-import { MOCK_STAFF_QUEUES } from '../../constants/mockData';
-import { QueueItem } from '../../types';
+import {
+  MOCK_STAFF_CS_QUEUES,
+  MOCK_STAFF_TELLER_QUEUES,
+} from '../../constants/mockData';
+import { QueueTicket, ServiceType } from '../../types';
 
 export default function StaffQueueScreen() {
-  const [queues, setQueues] = useState<QueueItem[]>(MOCK_STAFF_QUEUES);
+  const [activeTab, setActiveTab] = useState<ServiceType>('CUSTOMER_SERVICE');
+  const [csQueues, setCsQueues] = useState<QueueTicket[]>(MOCK_STAFF_CS_QUEUES);
+  const [tellerQueues, setTellerQueues] = useState<QueueTicket[]>(
+    MOCK_STAFF_TELLER_QUEUES
+  );
 
-  const currentServing = queues.find((q) => q.status === 'SERVING');
-  const currentCalled = queues.find((q) => q.status === 'CALLED');
-  const waitingList = queues.filter((q) => q.status === 'WAITING');
+  const activeQueues = activeTab === 'CUSTOMER_SERVICE' ? csQueues : tellerQueues;
+  const setActiveQueues =
+    activeTab === 'CUSTOMER_SERVICE' ? setCsQueues : setTellerQueues;
 
-  // Interactive local actions for operator
+  const currentServing = activeQueues.find((q) => q.status === 'SERVING');
+  const currentCalled = activeQueues.find((q) => q.status === 'CALLED');
+  const waitingList = activeQueues.filter((q) => q.status === 'WAITING');
+
+  const counterLabel =
+    activeTab === 'CUSTOMER_SERVICE' ? 'Counter 02' : 'Teller 01';
+
+  // Staff queue operations
   const handleCallNext = () => {
     if (waitingList.length === 0) return;
-    const nextQueue = waitingList[0];
-    setQueues((prev) =>
-      prev.map((q) =>
-        q.id === nextQueue.id
-          ? { ...q, status: 'CALLED', calledAt: 'Just now' }
-          : q
+    const nextTicket = waitingList[0];
+
+    setActiveQueues((prev) =>
+      prev.map((item) =>
+        item.id === nextTicket.id
+          ? {
+              ...item,
+              status: 'CALLED',
+              counterName: counterLabel,
+              calledAt: 'Just now',
+            }
+          : item
       )
     );
   };
 
   const handleStartService = () => {
     if (!currentCalled) return;
-    setQueues((prev) =>
-      prev.map((q) => {
-        if (q.status === 'SERVING') {
-          return { ...q, status: 'SERVED' };
+
+    setActiveQueues((prev) =>
+      prev.map((item) => {
+        if (item.status === 'SERVING') {
+          return { ...item, status: 'SERVED', completedAt: 'Just now' };
         }
-        if (q.id === currentCalled.id) {
-          return { ...q, status: 'SERVING', servedAt: 'Just now' };
+        if (item.id === currentCalled.id) {
+          return {
+            ...item,
+            status: 'SERVING',
+            servedAt: 'Just now',
+          };
         }
-        return q;
+        return item;
       })
     );
   };
 
   const handleMarkServed = () => {
     if (!currentServing) return;
-    setQueues((prev) =>
-      prev.map((q) =>
-        q.id === currentServing.id ? { ...q, status: 'SERVED' } : q
+
+    setActiveQueues((prev) =>
+      prev.map((item) =>
+        item.id === currentServing.id
+          ? { ...item, status: 'SERVED', completedAt: 'Just now' }
+          : item
       )
     );
   };
 
   const handleSkipCalled = () => {
     if (!currentCalled) return;
-    setQueues((prev) =>
-      prev.map((q) =>
-        q.id === currentCalled.id ? { ...q, status: 'SKIPPED' } : q
+
+    setActiveQueues((prev) =>
+      prev.map((item) =>
+        item.id === currentCalled.id
+          ? { ...item, status: 'SKIPPED' }
+          : item
       )
     );
   };
 
-  const handleResetDemo = () => {
-    setQueues(MOCK_STAFF_QUEUES);
+  const handleResetList = () => {
+    if (activeTab === 'CUSTOMER_SERVICE') {
+      setCsQueues(MOCK_STAFF_CS_QUEUES);
+    } else {
+      setTellerQueues(MOCK_STAFF_TELLER_QUEUES);
+    }
   };
 
   return (
     <Screen contentContainerStyle={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.placeName}>Barber Hub Operations</Text>
-          <Text style={styles.title}>Today's Queue Manager</Text>
+          <Text style={styles.brandTitle}>NEXA BANK OPERATIONS</Text>
+          <Text style={styles.title}>Branch Queue Manager</Text>
+          <Text style={styles.subtitle}>
+            Depok Branch • Active Station: {counterLabel}
+          </Text>
         </View>
-        <TouchableOpacity style={styles.resetBtn} onPress={handleResetDemo}>
+        <TouchableOpacity style={styles.resetBtn} onPress={handleResetList}>
           <Text style={styles.resetText}>Reset List</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Primary Actions Panel */}
+      {/* Service Tab Switcher */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[
+            styles.tabItem,
+            activeTab === 'CUSTOMER_SERVICE' && styles.tabItemActive,
+          ]}
+          onPress={() => setActiveTab('CUSTOMER_SERVICE')}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'CUSTOMER_SERVICE' && styles.tabTextActive,
+            ]}
+          >
+            Customer Service (CS)
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.tabItem,
+            activeTab === 'TELLER' && styles.tabItemActive,
+          ]}
+          onPress={() => setActiveTab('TELLER')}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'TELLER' && styles.tabTextActive,
+            ]}
+          >
+            Teller Counter (T)
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Operator Action Panel */}
       <View style={styles.actionPanel}>
-        <Text style={styles.panelTitle}>STAFF ACTIONS</Text>
+        <Text style={styles.panelTitle}>OPERATOR CALL CONTROLS</Text>
         <View style={styles.actionGrid}>
           <Button
-            title="Call Next"
+            title="Call Next 📢"
             variant="primary"
             size="md"
             onPress={handleCallNext}
@@ -89,7 +164,7 @@ export default function StaffQueueScreen() {
             style={styles.actionBtn}
           />
           <Button
-            title="Start Service"
+            title="Start Service ⏱️"
             variant="secondary"
             size="md"
             onPress={handleStartService}
@@ -108,7 +183,7 @@ export default function StaffQueueScreen() {
             style={styles.actionBtn}
           />
           <Button
-            title="Skip Customer ✕"
+            title="Skip Ticket ✕"
             variant="danger"
             size="sm"
             onPress={handleSkipCalled}
@@ -118,59 +193,71 @@ export default function StaffQueueScreen() {
         </View>
       </View>
 
-      {/* Serving & Called Status Cards */}
+      {/* Counter Focus Grid */}
       <View style={styles.liveGrid}>
         <View style={[styles.statusBox, styles.servingBox]}>
           <Text style={styles.statusBoxLabel}>NOW SERVING</Text>
           <Text style={styles.statusBoxNumber}>
-            {currentServing ? `#${currentServing.queueNumber}` : '—'}
+            {currentServing ? currentServing.ticketNumber : '—'}
           </Text>
           <Text style={styles.statusBoxName}>
-            {currentServing ? currentServing.customerName : 'Chair Empty'}
+            {currentServing ? currentServing.customerName : 'Counter Idle'}
+          </Text>
+          <Text style={styles.counterTag}>
+            {currentServing?.counterName || counterLabel}
           </Text>
         </View>
 
         <View style={[styles.statusBox, styles.calledBox]}>
-          <Text style={styles.statusBoxLabel}>CALLED (NEXT)</Text>
+          <Text style={styles.statusBoxLabel}>CALLED (STEPPING UP)</Text>
           <Text style={styles.statusBoxNumber}>
-            {currentCalled ? `#${currentCalled.queueNumber}` : '—'}
+            {currentCalled ? currentCalled.ticketNumber : '—'}
           </Text>
           <Text style={styles.statusBoxName}>
-            {currentCalled ? currentCalled.customerName : 'No one called'}
+            {currentCalled ? currentCalled.customerName : 'No ticket called'}
+          </Text>
+          <Text style={styles.counterTag}>
+            {currentCalled ? `Called at ${currentCalled.calledAt}` : 'Waiting call'}
           </Text>
         </View>
       </View>
 
-      {/* Waiting List */}
+      {/* Waiting Nasabah List */}
       <View style={styles.listSection}>
         <View style={styles.listHeaderRow}>
           <Text style={styles.listSectionTitle}>
-            Waiting Customers ({waitingList.length})
+            Waiting Nasabah ({waitingList.length})
           </Text>
-          <Text style={styles.listSub}>Avg. 5 min / customer</Text>
+          <Text style={styles.listSub}>
+            {activeTab === 'CUSTOMER_SERVICE' ? '~15 min/ticket' : '~5 min/ticket'}
+          </Text>
         </View>
 
         {waitingList.length > 0 ? (
-          waitingList.map((q, idx) => (
-            <View key={q.id} style={styles.waitingItem}>
-              <View style={styles.waitingNumberCircle}>
-                <Text style={styles.waitingNumberText}>#{q.queueNumber}</Text>
-              </View>
-
-              <View style={styles.waitingInfo}>
-                <Text style={styles.waitingCustomerName}>{q.customerName}</Text>
-                <Text style={styles.waitingTime}>
-                  Joined {q.joinedAt} • {idx} people ahead
+          waitingList.map((ticket, idx) => (
+            <View key={ticket.id} style={styles.waitingItem}>
+              <View style={styles.waitingNumberBadge}>
+                <Text style={styles.waitingNumberText}>
+                  {ticket.ticketNumber}
                 </Text>
               </View>
 
-              <StatusBadge status={q.status} showDot={false} />
+              <View style={styles.waitingInfo}>
+                <Text style={styles.waitingCustomerName}>
+                  {ticket.customerName}
+                </Text>
+                <Text style={styles.waitingMeta}>
+                  Joined {ticket.createdAt} • {idx} ahead
+                </Text>
+              </View>
+
+              <StatusBadge status={ticket.status} showDot={false} />
             </View>
           ))
         ) : (
           <View style={styles.emptyList}>
             <Text style={styles.emptyListText}>
-              All customers have been called or served! 🎉
+              All nasabah in this queue have been served! 🏛️
             </Text>
           </View>
         )}
@@ -186,20 +273,26 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 16,
     paddingTop: 8,
   },
-  placeName: {
-    fontSize: 12,
-    color: Colors.textMuted,
-    fontWeight: '700',
-    textTransform: 'uppercase',
+  brandTitle: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.bankBlue,
+    letterSpacing: 1.5,
   },
   title: {
     fontSize: 22,
-    fontWeight: '800',
-    color: Colors.text,
+    fontWeight: '900',
+    color: Colors.bankNavy,
+    marginTop: 2,
+  },
+  subtitle: {
+    fontSize: 12,
+    color: Colors.textMuted,
+    marginTop: 2,
   },
   resetBtn: {
     paddingHorizontal: 10,
@@ -213,6 +306,37 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     color: Colors.textSecondary,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: Colors.surfaceSubtle,
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  tabItem: {
+    flex: 1,
+    paddingVertical: 9,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  tabItemActive: {
+    backgroundColor: Colors.surface,
+    shadowColor: '#0A192F',
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  tabText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textMuted,
+  },
+  tabTextActive: {
+    color: Colors.bankNavy,
+    fontWeight: '700',
   },
   actionPanel: {
     backgroundColor: Colors.surface,
@@ -254,7 +378,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   servingBox: {
-    backgroundColor: Colors.primaryLight,
+    backgroundColor: Colors.bankBlueLight,
     borderColor: '#BFDBFE',
   },
   calledBox: {
@@ -269,15 +393,21 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   statusBoxNumber: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: Colors.text,
+    fontSize: 28,
+    fontWeight: '900',
+    color: Colors.bankNavy,
   },
   statusBoxName: {
     fontSize: 12,
     fontWeight: '600',
     color: Colors.textSecondary,
     marginTop: 2,
+  },
+  counterTag: {
+    fontSize: 10,
+    color: Colors.textMuted,
+    marginTop: 4,
+    fontWeight: '600',
   },
   listSection: {
     marginTop: 4,
@@ -290,8 +420,8 @@ const styles = StyleSheet.create({
   },
   listSectionTitle: {
     fontSize: 16,
-    fontWeight: '700',
-    color: Colors.text,
+    fontWeight: '800',
+    color: Colors.bankNavy,
   },
   listSub: {
     fontSize: 12,
@@ -307,19 +437,21 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     marginBottom: 10,
   },
-  waitingNumberCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+  waitingNumberBadge: {
+    width: 48,
+    height: 48,
+    borderRadius: 10,
     backgroundColor: Colors.surfaceSubtle,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
   },
   waitingNumberText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '800',
-    color: Colors.text,
+    color: Colors.bankNavy,
   },
   waitingInfo: {
     flex: 1,
@@ -329,7 +461,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.text,
   },
-  waitingTime: {
+  waitingMeta: {
     fontSize: 12,
     color: Colors.textMuted,
     marginTop: 2,

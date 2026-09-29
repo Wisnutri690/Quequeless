@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { QueueStatus, OrderStatus } from '../types';
+import { QueueStatus } from '../types';
 import { Colors } from '../constants/colors';
 
 interface StatusBadgeProps {
-  status: QueueStatus | OrderStatus;
+  status: QueueStatus;
   showDot?: boolean;
 }
 
@@ -12,57 +12,46 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, showDot = true
   const getBadgeConfig = () => {
     switch (status) {
       case 'WAITING':
-      case 'PENDING':
         return {
-          bg: Colors.waiting.bg,
-          text: Colors.waiting.text,
-          border: Colors.waiting.border,
-          label: status === 'WAITING' ? 'Waiting' : 'Pending',
+          bg: Colors.statusWaiting.bg,
+          text: Colors.statusWaiting.text,
+          border: Colors.statusWaiting.border,
+          label: 'Waiting in Queue',
         };
       case 'CALLED':
         return {
-          bg: Colors.called.bg,
-          text: Colors.called.text,
-          border: Colors.called.border,
-          label: "You're Called",
+          bg: Colors.statusCalled.bg,
+          text: Colors.statusCalled.text,
+          border: Colors.statusCalled.border,
+          label: 'Now Called',
         };
       case 'SERVING':
-      case 'PREPARING':
         return {
-          bg: Colors.serving.bg,
-          text: Colors.serving.text,
-          border: Colors.serving.border,
-          label: status === 'SERVING' ? 'Serving' : 'Preparing',
+          bg: Colors.statusServing.bg,
+          text: Colors.statusServing.text,
+          border: Colors.statusServing.border,
+          label: 'In Service',
         };
-      case 'ALMOST_READY':
-        return {
-          bg: '#FEF9C3',
-          text: '#854D0E',
-          border: '#FEF08A',
-          label: 'Almost Ready',
-        };
-      case 'READY':
       case 'SERVED':
         return {
-          bg: Colors.ready.bg,
-          text: Colors.ready.text,
-          border: Colors.ready.border,
-          label: status === 'READY' ? 'Ready for Pickup' : 'Served',
-        };
-      case 'PICKED_UP':
-        return {
-          bg: Colors.pickedUp.bg,
-          text: Colors.pickedUp.text,
-          border: Colors.pickedUp.border,
-          label: 'Picked Up',
+          bg: Colors.statusServed.bg,
+          text: Colors.statusServed.text,
+          border: Colors.statusServed.border,
+          label: 'Served',
         };
       case 'CANCELLED':
+        return {
+          bg: Colors.statusSkipped.bg,
+          text: Colors.statusSkipped.text,
+          border: Colors.statusSkipped.border,
+          label: 'Cancelled',
+        };
       case 'SKIPPED':
         return {
-          bg: Colors.danger.bg,
-          text: Colors.danger.text,
-          border: Colors.danger.border,
-          label: status === 'CANCELLED' ? 'Cancelled' : 'Skipped',
+          bg: Colors.statusSkipped.bg,
+          text: Colors.statusSkipped.text,
+          border: Colors.statusSkipped.border,
+          label: 'Skipped',
         };
       default:
         return {
@@ -95,7 +84,7 @@ const styles = StyleSheet.create({
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 9,
     paddingVertical: 4,
     borderRadius: 20,
     borderWidth: 1,
@@ -108,9 +97,9 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   label: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 0.3,
+    letterSpacing: 0.4,
   },
 });

@@ -14,10 +14,10 @@ import { Colors } from '../../constants/colors';
 export default function RegisterScreen() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
 
   const handleRegister = () => {
-    // Testing navigation: navigate to customer home
     router.replace('/(customer)/home');
   };
 
@@ -31,15 +31,16 @@ export default function RegisterScreen() {
       </TouchableOpacity>
 
       <View style={styles.header}>
-        <Text style={styles.title}>Create account</Text>
+        <Text style={styles.brandTitle}>NEXA BANK</Text>
+        <Text style={styles.title}>Register Nasabah</Text>
         <Text style={styles.subtitle}>
-          Get started with QueueLess to save time waiting at your favorite places.
+          Create your digital queue profile to get instant access to branch queues.
         </Text>
       </View>
 
       <View style={styles.form}>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Full Name</Text>
+          <Text style={styles.label}>Full Name (According to KTP)</Text>
           <TextInput
             style={styles.input}
             placeholder="Wisnu Tri"
@@ -53,12 +54,24 @@ export default function RegisterScreen() {
           <Text style={styles.label}>Email Address</Text>
           <TextInput
             style={styles.input}
-            placeholder="name@example.com"
+            placeholder="wisnu@example.com"
             placeholderTextColor={Colors.textLight}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Phone Number</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="+62 812-3456-7890"
+            placeholderTextColor={Colors.textLight}
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
           />
         </View>
 
@@ -75,7 +88,7 @@ export default function RegisterScreen() {
         </View>
 
         <Button
-          title="Create Account"
+          title="Create Nasabah Profile"
           onPress={handleRegister}
           size="lg"
           style={styles.submitBtn}
@@ -107,12 +120,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   header: {
-    marginBottom: 28,
+    marginBottom: 26,
+  },
+  brandTitle: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: Colors.bankBlue,
+    letterSpacing: 1.5,
+    marginBottom: 4,
   },
   title: {
     fontSize: 28,
-    fontWeight: '800',
-    color: Colors.text,
+    fontWeight: '900',
+    color: Colors.bankNavy,
     letterSpacing: -0.5,
     marginBottom: 6,
   },
@@ -122,7 +142,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   form: {
-    gap: 16,
+    gap: 15,
   },
   inputGroup: {
     gap: 6,
@@ -144,11 +164,12 @@ const styles = StyleSheet.create({
   },
   submitBtn: {
     marginTop: 8,
+    backgroundColor: Colors.bankNavy,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 32,
+    marginTop: 30,
   },
   footerText: {
     fontSize: 14,
@@ -157,6 +178,6 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 14,
     fontWeight: '700',
-    color: Colors.primaryAccent,
+    color: Colors.bankBlue,
   },
 });

@@ -15,7 +15,7 @@ export default function CustomerTabsLayout() {
           paddingBottom: 8,
           paddingTop: 8,
         },
-        tabBarActiveTintColor: Colors.primaryAccent,
+        tabBarActiveTintColor: Colors.bankBlue,
         tabBarInactiveTintColor: Colors.textMuted,
         tabBarLabelStyle: {
           fontSize: 11,
@@ -27,21 +27,21 @@ export default function CustomerTabsLayout() {
         name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>🏠</Text>,
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>🏛️</Text>,
         }}
       />
       <Tabs.Screen
         name="queue"
         options={{
-          title: 'My Queue',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>⏳</Text>,
+          title: 'My Ticket',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>🎫</Text>,
         }}
       />
       <Tabs.Screen
-        name="order"
+        name="history"
         options={{
-          title: 'My Orders',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>🍜</Text>,
+          title: 'History',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>📜</Text>,
         }}
       />
       <Tabs.Screen

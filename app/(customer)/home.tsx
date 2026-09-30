@@ -7,10 +7,11 @@ import { Colors } from '../../constants/colors';
 import { MOCK_BRANCHES } from '../../constants/mockData';
 import { ServiceType } from '../../types';
 
+import { QueueService } from '../../services/queueService';
+
 export default function CustomerHomeScreen() {
   const params = useLocalSearchParams<{ branch?: string }>();
 
-  // Determine branch from QR scan parameter (default to Depok Branch)
   const currentBranch =
     MOCK_BRANCHES.find(
       (b) =>
@@ -27,54 +28,73 @@ export default function CustomerHomeScreen() {
   const [serviceModal, setServiceModal] = useState<null | 'SERVICE' | 'CONFIRM'>(null);
   const [selectedService, setSelectedService] = useState<ServiceType | null>(null);
   const [activeTicket, setActiveTicket] = useState<{
+    id?: string;
     ticketNumber: string;
     serviceName: string;
     branchName: string;
     peopleAhead: number;
     wait: number;
-  } | null>({
-    ticketNumber: 'T-019',
-    serviceName: 'Teller',
-    branchName: currentBranch.shortName,
-    peopleAhead: 4,
-    wait: 20,
-  });
+  } | null>(null);
 
   const handleSelectService = (service: ServiceType) => {
     setSelectedService(service);
     setServiceModal('CONFIRM');
   };
 
-  const handleJoinQueue = () => {
+  const handleJoinQueue = async () => {
+    if (!selectedService) return;
     setServiceModal(null);
+    const createdTicket = await QueueService.createTicket(
+      currentBranch.id,
+      selectedService,
+      currentBranch.shortName
+    );
     setActiveTicket({
-      ticketNumber: selectedService === 'CUSTOMER_SERVICE' ? 'CS-019' : 'T-019',
-      serviceName:
-        selectedService === 'CUSTOMER_SERVICE' ? 'Customer Service' : 'Teller',
+      id: createdTicket.id,
+      ticketNumber: createdTicket.ticketNumber,
+      serviceName: createdTicket.serviceName,
       branchName: currentBranch.shortName,
-      peopleAhead: 4,
-      wait: selectedService === 'CUSTOMER_SERVICE' ? 20 : 15,
+      peopleAhead: createdTicket.peopleAhead,
+      wait: createdTicket.estimatedWaitMinutes,
     });
-    router.push('/(customer)/queue');
+    router.push({
+      pathname: '/(customer)/queue',
+      params: { ticketId: createdTicket.id },
+    });
   };
+
+  const tellerService = currentBranch.services?.find((s) => s.type === 'TELLER');
+  const csService = currentBranch.services?.find(
+    (s) => s.type === 'CUSTOMER_SERVICE'
+  );
 
   return (
     <Screen contentContainerStyle={styles.container}>
-      {/* Header with Detected Branch */}
       <View style={styles.header}>
         <Text style={styles.bankName}>NEXA BANK</Text>
         <Text style={styles.branchName}>{currentBranch.name}</Text>
         <Text style={styles.branchAddress}>{currentBranch.address}</Text>
+
+        <View style={styles.branchStatusPill}>
+          <View style={styles.statusDot} />
+          <Text style={styles.branchStatusText}>
+            Open • {currentBranch.operatingHours || '08:00 - 15:00 WIB'}
+          </Text>
+        </View>
       </View>
 
-      {/* Active Ticket Banner (if active) */}
       {activeTicket && (
         <View style={styles.activeSection}>
           <Text style={styles.sectionLabel}>YOUR ACTIVE QUEUE</Text>
           <TouchableOpacity
             style={styles.activeCard}
             activeOpacity={0.8}
-            onPress={() => router.push('/(customer)/queue')}
+            onPress={() =>
+              router.push({
+                pathname: '/(customer)/queue',
+                params: activeTicket.id ? { ticketId: activeTicket.id } : undefined,
+              })
+            }
           >
             <View>
               <Text style={styles.activeTicketNum}>
@@ -92,7 +112,52 @@ export default function CustomerHomeScreen() {
         </View>
       )}
 
-      {/* Primary Action Card */}
+      <View style={styles.liveStatusSection}>
+        <Text style={styles.sectionLabel}>LIVE SERVICE STATUS</Text>
+        <View style={styles.serviceCardsGrid}>
+          <View style={styles.serviceMetricCard}>
+            <View style={styles.cardHeaderRow}>
+              <Text style={styles.serviceTypeName}>Teller</Text>
+              <View style={styles.servingNumberBadge}>
+                <Text style={styles.servingLabel}>Serving</Text>
+                <Text style={styles.servingNumberVal}>
+                  {tellerService?.currentServingNumber || '—'}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.cardFooterRow}>
+              <Text style={styles.metricText}>
+                {tellerService?.waitingCount ?? 0} waiting • ~{tellerService?.avgWaitMinutes ?? 5} min
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.serviceMetricCard}>
+            <View style={styles.cardHeaderRow}>
+              <Text style={styles.serviceTypeName}>Customer Service</Text>
+              <View style={styles.servingNumberBadge}>
+                <Text style={styles.servingLabel}>Serving</Text>
+                <Text style={styles.servingNumberVal}>
+                  {csService?.currentServingNumber || '—'}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.cardFooterRow}>
+              <Text style={styles.metricText}>
+                {csService?.waitingCount ?? 0} waiting • ~{csService?.avgWaitMinutes ?? 15} min
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.reminderCard}>
+        <Text style={styles.reminderTag}>SERVICE PREPARATION</Text>
+        <Text style={styles.reminderText}>
+          Please have your e-KTP and transaction documents ready prior to being called.
+        </Text>
+      </View>
+
       <View style={styles.ctaCard}>
         <Text style={styles.ctaTitle}>Welcome to QueueLess</Text>
         <Text style={styles.ctaDesc}>
@@ -106,14 +171,12 @@ export default function CustomerHomeScreen() {
         />
       </View>
 
-      {/* Exit / Rescan QR link */}
       <View style={styles.bottomLinkArea}>
         <TouchableOpacity onPress={() => router.replace('/scan')}>
           <Text style={styles.rescanText}>Scan another branch QR</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Service Selection Modal (Branch is already detected) */}
       <Modal
         visible={serviceModal !== null}
         transparent
@@ -206,11 +269,11 @@ export default function CustomerHomeScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 24,
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     flexGrow: 1,
   },
   header: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   bankName: {
     fontSize: 11,
@@ -229,8 +292,32 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     marginTop: 2,
   },
+  branchStatusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 8,
+    alignSelf: 'flex-start',
+    backgroundColor: '#F0FDF4',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#16A34A',
+  },
+  branchStatusText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#166534',
+  },
   activeSection: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   sectionLabel: {
     fontSize: 10,
@@ -269,13 +356,86 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: Colors.textMuted,
   },
+  liveStatusSection: {
+    marginBottom: 18,
+  },
+  serviceCardsGrid: {
+    gap: 10,
+  },
+  serviceMetricCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  cardHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  serviceTypeName: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: Colors.bankNavy,
+  },
+  servingNumberBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: Colors.surfaceSubtle,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  servingLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: Colors.textMuted,
+    textTransform: 'uppercase',
+  },
+  servingNumberVal: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: Colors.bankBlue,
+  },
+  cardFooterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  metricText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+  },
+  reminderCard: {
+    backgroundColor: Colors.surfaceSubtle,
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginBottom: 18,
+  },
+  reminderTag: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.textMuted,
+    letterSpacing: 0.8,
+    marginBottom: 4,
+  },
+  reminderText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    lineHeight: 18,
+  },
   ctaCard: {
     backgroundColor: Colors.surface,
     borderRadius: 16,
-    padding: 24,
+    padding: 22,
     borderWidth: 1,
     borderColor: Colors.border,
-    marginBottom: 28,
+    marginBottom: 20,
   },
   ctaTitle: {
     fontSize: 22,

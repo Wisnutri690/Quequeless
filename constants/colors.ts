@@ -1,31 +1,25 @@
 export const Colors = {
-  // Brand / Banking palette
-  bankNavy: '#0A192F', // Signature NEXA Navy
+  bankNavy: '#0A192F',
   bankNavyLight: '#112240',
-  bankBlue: '#1D4ED8', // Primary trust accent
+  bankBlue: '#1D4ED8',
   bankBlueLight: '#EFF6FF',
-  bankGold: '#D97706', // Premium banking gold accent
+  bankGold: '#D97706',
   bankGoldLight: '#FEF3C7',
 
-  // Surfaces & Backgrounds
   background: '#F8FAFC',
   surface: '#FFFFFF',
   surfaceSubtle: '#F1F5F9',
   border: '#E2E8F0',
   borderLight: '#EDF2F7',
 
-  // Typography
   text: '#0F172A',
   textSecondary: '#475569',
   textMuted: '#64748B',
   textLight: '#94A3B8',
 
-  // Action Buttons
-  primary: '#1D4ED8', // Clean banking blue for primary actions
+  primary: '#1D4ED8',
   primaryLight: '#EFF6FF',
   primaryAccent: '#1D4ED8',
-
-  // Queue Status Badges
   statusWaiting: {
     bg: '#FEF3C7',
     text: '#92400E',

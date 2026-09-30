@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { Screen } from '../components/Screen';
 import { Button } from '../components/Button';
 import { Colors } from '../constants/colors';
+import { MOCK_BRANCHES } from '../constants/mockData';
 
 export default function LandingScreen() {
   const handleScanQr = () => {
@@ -24,6 +25,48 @@ export default function LandingScreen() {
         </Text>
         <Text style={styles.description}>
           Get your digital queue ticket before waiting at the counter.
+        </Text>
+      </View>
+
+      <View style={styles.guideCard}>
+        <Text style={styles.guideHeading}>HOW IT WORKS</Text>
+        <View style={styles.stepsList}>
+          <View style={styles.stepItem}>
+            <View style={styles.stepBadge}>
+              <Text style={styles.stepBadgeNumber}>1</Text>
+            </View>
+            <View style={styles.stepDetails}>
+              <Text style={styles.stepTitle}>Scan QR</Text>
+              <Text style={styles.stepDesc}>Scan QR stand at branch lobby</Text>
+            </View>
+          </View>
+
+          <View style={styles.stepItem}>
+            <View style={styles.stepBadge}>
+              <Text style={styles.stepBadgeNumber}>2</Text>
+            </View>
+            <View style={styles.stepDetails}>
+              <Text style={styles.stepTitle}>Pilih Layanan</Text>
+              <Text style={styles.stepDesc}>Choose Teller or Customer Service</Text>
+            </View>
+          </View>
+
+          <View style={styles.stepItem}>
+            <View style={styles.stepBadge}>
+              <Text style={styles.stepBadgeNumber}>3</Text>
+            </View>
+            <View style={styles.stepDetails}>
+              <Text style={styles.stepTitle}>Pantau Tiket</Text>
+              <Text style={styles.stepDesc}>Track queue & get called to counter</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.hoursPill}>
+        <View style={styles.hoursDot} />
+        <Text style={styles.hoursText}>
+          Branch Service Hours: Mon – Fri, {MOCK_BRANCHES[0].operatingHours || '08:00 - 15:00 WIB'}
         </Text>
       </View>
 
@@ -57,11 +100,11 @@ export default function LandingScreen() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    justifyContent: 'space-between',
-    paddingVertical: 40,
+    paddingVertical: 28,
   },
   topSection: {
-    marginTop: 20,
+    marginTop: 8,
+    marginBottom: 20,
   },
   bankName: {
     fontSize: 12,
@@ -82,12 +125,87 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: Colors.bankBlue,
     lineHeight: 32,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   description: {
     fontSize: 15,
     color: Colors.textSecondary,
     lineHeight: 22,
+  },
+  guideCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginBottom: 14,
+  },
+  guideHeading: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.textMuted,
+    letterSpacing: 1,
+    marginBottom: 12,
+  },
+  stepsList: {
+    gap: 12,
+  },
+  stepItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  stepBadge: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: Colors.surfaceSubtle,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepBadgeNumber: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: Colors.bankBlue,
+  },
+  stepDetails: {
+    flex: 1,
+  },
+  stepTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: Colors.bankNavy,
+  },
+  stepDesc: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginTop: 1,
+  },
+  hoursPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: Colors.surfaceSubtle,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginBottom: 24,
+  },
+  hoursDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#10B981',
+  },
+  hoursText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.textSecondary,
   },
   actionSection: {
     marginTop: 'auto',
@@ -118,3 +236,4 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
+

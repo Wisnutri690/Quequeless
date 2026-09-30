@@ -1,31 +1,121 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Screen } from '../../components/Screen';
 import { Button } from '../../components/Button';
 import { Colors } from '../../constants/colors';
+import { QueueTicket } from '../../types';
+import { QueueService } from '../../services/queueService';
 
-interface QueueNumberItem {
-  id: string;
-  ticketNumber: string;
-  status: 'WAITING' | 'CALLED' | 'SERVING' | 'SERVED' | 'SKIPPED';
-}
-
-const INITIAL_QUEUE_LIST: QueueNumberItem[] = [
-  { id: '1', ticketNumber: 'T-017', status: 'SERVING' },
-  { id: '2', ticketNumber: 'T-018', status: 'WAITING' },
-  { id: '3', ticketNumber: 'T-019', status: 'WAITING' },
-  { id: '4', ticketNumber: 'T-020', status: 'WAITING' },
-  { id: '5', ticketNumber: 'T-021', status: 'WAITING' },
+const DEV_FALLBACK_QUEUE_LIST: QueueTicket[] = [
+  {
+    id: '1',
+    ticketNumber: 'T-017',
+    serviceType: 'TELLER',
+    serviceName: 'Teller',
+    branchId: 'branch-depok',
+    branchName: 'Depok Branch',
+    customerId: 'c-1',
+    customerName: 'Customer 1',
+    status: 'SERVING',
+    counterName: 'Counter 03',
+    nowServingNumber: 'T-017',
+    peopleAhead: 0,
+    estimatedWaitMinutes: 0,
+    createdAt: '09:40 AM',
+  },
+  {
+    id: '2',
+    ticketNumber: 'T-018',
+    serviceType: 'TELLER',
+    serviceName: 'Teller',
+    branchId: 'branch-depok',
+    branchName: 'Depok Branch',
+    customerId: 'c-2',
+    customerName: 'Customer 2',
+    status: 'WAITING',
+    counterName: 'Counter 03',
+    nowServingNumber: 'T-017',
+    peopleAhead: 1,
+    estimatedWaitMinutes: 5,
+    createdAt: '09:42 AM',
+  },
+  {
+    id: '3',
+    ticketNumber: 'T-019',
+    serviceType: 'TELLER',
+    serviceName: 'Teller',
+    branchId: 'branch-depok',
+    branchName: 'Depok Branch',
+    customerId: 'c-3',
+    customerName: 'Customer 3',
+    status: 'WAITING',
+    counterName: 'Counter 03',
+    nowServingNumber: 'T-017',
+    peopleAhead: 2,
+    estimatedWaitMinutes: 10,
+    createdAt: '09:45 AM',
+  },
+  {
+    id: '4',
+    ticketNumber: 'T-020',
+    serviceType: 'TELLER',
+    serviceName: 'Teller',
+    branchId: 'branch-depok',
+    branchName: 'Depok Branch',
+    customerId: 'c-4',
+    customerName: 'Customer 4',
+    status: 'WAITING',
+    counterName: 'Counter 03',
+    nowServingNumber: 'T-017',
+    peopleAhead: 3,
+    estimatedWaitMinutes: 15,
+    createdAt: '09:48 AM',
+  },
+  {
+    id: '5',
+    ticketNumber: 'T-021',
+    serviceType: 'TELLER',
+    serviceName: 'Teller',
+    branchId: 'branch-depok',
+    branchName: 'Depok Branch',
+    customerId: 'c-5',
+    customerName: 'Customer 5',
+    status: 'WAITING',
+    counterName: 'Counter 03',
+    nowServingNumber: 'T-017',
+    peopleAhead: 4,
+    estimatedWaitMinutes: 20,
+    createdAt: '09:50 AM',
+  },
 ];
 
 export default function StaffQueueScreen() {
-  const [queues, setQueues] = useState<QueueNumberItem[]>(INITIAL_QUEUE_LIST);
+  const branchId = 'branch-depok';
+  const [queues, setQueues] = useState<QueueTicket[]>(DEV_FALLBACK_QUEUE_LIST);
+
+  const loadTickets = useCallback(async () => {
+    const data = await QueueService.getBranchTickets(branchId);
+    if (data && data.length > 0) {
+      setQueues(data);
+    }
+  }, [branchId]);
+
+  useEffect(() => {
+    loadTickets();
+    const unsubscribe = QueueService.subscribeBranchTickets(branchId, () => {
+      loadTickets();
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [branchId, loadTickets]);
 
   const nowServing = queues.find((q) => q.status === 'SERVING');
   const calledNext = queues.find((q) => q.status === 'CALLED');
   const waitingList = queues.filter((q) => q.status === 'WAITING');
 
-  const handleCallNext = () => {
+  const handleCallNext = async () => {
     if (waitingList.length === 0) return;
     const nextTicket = waitingList[0];
     setQueues((prev) =>
@@ -33,10 +123,12 @@ export default function StaffQueueScreen() {
         q.id === nextTicket.id ? { ...q, status: 'CALLED' } : q
       )
     );
+    await QueueService.updateTicketStatus(nextTicket.id, 'CALLED', 'Counter 03');
   };
 
-  const handleStartService = () => {
+  const handleStartService = async () => {
     if (!calledNext) return;
+    const currentServing = nowServing;
     setQueues((prev) =>
       prev.map((q) => {
         if (q.status === 'SERVING') {
@@ -48,63 +140,92 @@ export default function StaffQueueScreen() {
         return q;
       })
     );
+    if (currentServing) {
+      await QueueService.updateTicketStatus(currentServing.id, 'SERVED');
+    }
+    await QueueService.updateTicketStatus(calledNext.id, 'SERVING', 'Counter 03');
   };
 
-  const handleMarkServed = () => {
+  const handleMarkServed = async () => {
     if (!nowServing) return;
+    const targetId = nowServing.id;
     setQueues((prev) =>
       prev.map((q) =>
-        q.id === nowServing.id ? { ...q, status: 'SERVED' } : q
+        q.id === targetId ? { ...q, status: 'SERVED' } : q
       )
     );
+    await QueueService.updateTicketStatus(targetId, 'SERVED');
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
     if (!calledNext) return;
+    const targetId = calledNext.id;
     setQueues((prev) =>
       prev.map((q) =>
-        q.id === calledNext.id ? { ...q, status: 'SKIPPED' } : q
+        q.id === targetId ? { ...q, status: 'SKIPPED' } : q
       )
     );
+    await QueueService.updateTicketStatus(targetId, 'SKIPPED');
   };
 
-  const handleReset = () => {
-    setQueues(INITIAL_QUEUE_LIST);
+  const handleRefresh = () => {
+    loadTickets();
   };
 
   return (
     <Screen contentContainerStyle={styles.container}>
-      {/* Header */}
       <View style={styles.topRow}>
         <View>
           <Text style={styles.counterHeading}>Counter 03</Text>
           <Text style={styles.stationSub}>Teller Operations</Text>
         </View>
-        <TouchableOpacity onPress={handleReset}>
-          <Text style={styles.resetText}>Reset</Text>
+        <TouchableOpacity onPress={handleRefresh} style={styles.refreshBtn}>
+          <Text style={styles.refreshText}>Refresh</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Now Serving Section */}
       <View style={styles.servingSection}>
-        <Text style={styles.sectionLabel}>NOW SERVING</Text>
+        <View style={styles.servingHeaderRow}>
+          <Text style={styles.sectionLabel}>NOW SERVING</Text>
+          {nowServing && (
+            <View style={styles.timerPill}>
+              <View style={styles.timerDot} />
+              <Text style={styles.timerText}>In Service • Counter 03</Text>
+            </View>
+          )}
+        </View>
+
         <Text style={styles.mainServingNumber}>
           {nowServing ? nowServing.ticketNumber : '—'}
         </Text>
 
         {nowServing && (
-          <Button
-            title="MARK SERVED"
-            size="md"
-            onPress={handleMarkServed}
-            style={styles.markServedBtn}
-          />
+          <View style={styles.servingDetailsRow}>
+            <Text style={styles.servingDetailText}>Teller Services • Cash & Transfers</Text>
+          </View>
+        )}
+
+        {nowServing && (
+          <View style={styles.servingActionRow}>
+            <Button
+              title="MARK SERVED"
+              size="md"
+              onPress={handleMarkServed}
+              style={styles.markServedBtn}
+            />
+            <Button
+              title="RECALL"
+              variant="outline"
+              size="md"
+              onPress={() => {}}
+              style={styles.recallBtn}
+            />
+          </View>
         )}
       </View>
 
-      {/* Next Section */}
       <View style={styles.nextSection}>
-        <Text style={styles.sectionLabel}>NEXT</Text>
+        <Text style={styles.sectionLabel}>NEXT IN LINE</Text>
         <Text style={styles.nextNumber}>
           {calledNext ? calledNext.ticketNumber : waitingList[0]?.ticketNumber || '—'}
         </Text>
@@ -137,7 +258,6 @@ export default function StaffQueueScreen() {
         )}
       </View>
 
-      {/* Waiting Section */}
       <View style={styles.waitingSection}>
         <Text style={styles.sectionLabel}>WAITING ({waitingList.length})</Text>
 
@@ -178,10 +298,18 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     marginTop: 2,
   },
-  resetText: {
-    fontSize: 13,
+  refreshBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: Colors.surfaceSubtle,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  refreshText: {
+    fontSize: 12,
     color: Colors.bankBlue,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   sectionLabel: {
     fontSize: 11,
@@ -193,22 +321,67 @@ const styles = StyleSheet.create({
   servingSection: {
     backgroundColor: Colors.surface,
     borderRadius: 16,
-    padding: 24,
+    padding: 20,
     borderWidth: 1,
     borderColor: Colors.border,
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
+  },
+  servingHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 4,
+  },
+  timerPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#F0FDF4',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+  },
+  timerDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#16A34A',
+  },
+  timerText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#166534',
   },
   mainServingNumber: {
     fontSize: 52,
     fontWeight: '900',
     color: Colors.bankNavy,
     letterSpacing: -1,
-    marginVertical: 8,
+    marginVertical: 4,
+  },
+  servingDetailsRow: {
+    marginBottom: 12,
+  },
+  servingDetailText: {
+    fontSize: 12,
+    color: Colors.textMuted,
+    fontWeight: '600',
+  },
+  servingActionRow: {
+    flexDirection: 'row',
+    gap: 10,
+    width: '100%',
+    marginTop: 6,
   },
   markServedBtn: {
-    width: '100%',
-    marginTop: 12,
+    flex: 2,
+  },
+  recallBtn: {
+    flex: 1,
   },
   nextSection: {
     backgroundColor: Colors.surface,

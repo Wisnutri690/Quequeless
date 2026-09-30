@@ -67,6 +67,14 @@ export default function StaffLoginScreen() {
           style={styles.submitBtn}
         />
       </View>
+
+      <View style={styles.securityBox}>
+        <Text style={styles.securityText}>
+          Authorized NEXA Bank personnel only. All access and queue actions are logged
+          for operational auditing.
+        </Text>
+        <Text style={styles.supportText}>IT Support Desk: ext. 4091</Text>
+      </View>
     </Screen>
   );
 }
@@ -130,5 +138,23 @@ const styles = StyleSheet.create({
   },
   submitBtn: {
     marginTop: 8,
+  },
+  securityBox: {
+    marginTop: 'auto',
+    paddingTop: 24,
+    paddingBottom: 12,
+    alignItems: 'center',
+  },
+  securityText: {
+    fontSize: 11,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    lineHeight: 16,
+  },
+  supportText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    marginTop: 6,
   },
 });

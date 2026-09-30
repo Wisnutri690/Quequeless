@@ -32,16 +32,16 @@ export interface Branch {
 
 export interface QueueTicket {
   id: string;
-  ticketNumber: string; // e.g. 'CS-018', 'T-004'
+  ticketNumber: string;
   serviceType: ServiceType;
-  serviceName: string; // 'Teller' or 'Customer Service'
+  serviceName: string;
   branchId: string;
   branchName: string;
   customerId: string;
   customerName: string;
   status: QueueStatus;
-  counterName?: string; // e.g. 'Counter 02', 'Teller 01'
-  nowServingNumber: string; // e.g. 'CS-014'
+  counterName?: string;
+  nowServingNumber: string;
   peopleAhead: number;
   estimatedWaitMinutes: number;
   createdAt: string;
@@ -56,7 +56,7 @@ export interface UserProfile {
   email: string;
   role: UserRole;
   phone?: string;
-  customerReference?: string; // Fictional Customer Reference ID (e.g. NXL-0001)
+  customerReference?: string;
 }
 
 export interface StaffProfile {

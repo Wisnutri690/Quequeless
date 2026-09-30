@@ -8,7 +8,7 @@ interface StatusBadgeProps {
   showDot?: boolean;
 }
 
-export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, showDot = true }) => {
+export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   const getBadgeConfig = () => {
     switch (status) {
       case 'WAITING':
@@ -72,9 +72,6 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, showDot = true
         { backgroundColor: config.bg, borderColor: config.border },
       ]}
     >
-      {showDot && (
-        <View style={[styles.dot, { backgroundColor: config.text }]} />
-      )}
       <Text style={[styles.label, { color: config.text }]}>{config.label}</Text>
     </View>
   );

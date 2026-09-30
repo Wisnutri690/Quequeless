@@ -18,12 +18,56 @@ const LOGS: DailyLogItem[] = [
 ];
 
 export default function StaffHistoryScreen() {
+  const [filter, setFilter] = React.useState<'ALL' | 'SERVED' | 'SKIPPED'>('ALL');
+
+  const filteredLogs = LOGS.filter((item) => {
+    if (filter === 'SERVED') return item.status === 'Served';
+    if (filter === 'SKIPPED') return item.status === 'Skipped';
+    return true;
+  });
+
   return (
     <Screen contentContainerStyle={styles.container}>
-      <Text style={styles.screenHeading}>Daily Logs</Text>
+      <Text style={styles.screenHeading}>Daily Activity Logs</Text>
+
+      <View style={styles.kpiGrid}>
+        <View style={styles.kpiCard}>
+          <Text style={styles.kpiLabel}>TOTAL</Text>
+          <Text style={styles.kpiValue}>4</Text>
+        </View>
+        <View style={styles.kpiCard}>
+          <Text style={styles.kpiLabel}>SERVED</Text>
+          <Text style={[styles.kpiValue, { color: '#059669' }]}>2</Text>
+        </View>
+        <View style={styles.kpiCard}>
+          <Text style={styles.kpiLabel}>SKIPPED</Text>
+          <Text style={[styles.kpiValue, { color: '#DC2626' }]}>1</Text>
+        </View>
+      </View>
+
+      <View style={styles.filterRow}>
+        <Text
+          style={[styles.filterChip, filter === 'ALL' && styles.filterChipActive]}
+          onPress={() => setFilter('ALL')}
+        >
+          All (4)
+        </Text>
+        <Text
+          style={[styles.filterChip, filter === 'SERVED' && styles.filterChipActive]}
+          onPress={() => setFilter('SERVED')}
+        >
+          Served (2)
+        </Text>
+        <Text
+          style={[styles.filterChip, filter === 'SKIPPED' && styles.filterChipActive]}
+          onPress={() => setFilter('SKIPPED')}
+        >
+          Skipped (1)
+        </Text>
+      </View>
 
       <View style={styles.list}>
-        {LOGS.map((item, idx) => (
+        {filteredLogs.map((item, idx) => (
           <View key={idx} style={styles.logRow}>
             <View style={styles.left}>
               <Text style={styles.ticketText}>{item.ticket}</Text>
@@ -46,6 +90,10 @@ export default function StaffHistoryScreen() {
           </View>
         ))}
       </View>
+
+      <Text style={styles.auditNotice}>
+        End-of-day synchronization automatically logs to branch records at 16:30 WIB.
+      </Text>
     </Screen>
   );
 }
@@ -58,7 +106,54 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '900',
     color: Colors.bankNavy,
-    marginBottom: 24,
+    marginBottom: 20,
+  },
+  kpiGrid: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 20,
+  },
+  kpiCard: {
+    flex: 1,
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
+  },
+  kpiLabel: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: Colors.textMuted,
+    letterSpacing: 0.8,
+    marginBottom: 4,
+  },
+  kpiValue: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: Colors.bankNavy,
+  },
+  filterRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 16,
+  },
+  filterChip: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    backgroundColor: Colors.surface,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  filterChipActive: {
+    backgroundColor: Colors.bankNavy,
+    borderColor: Colors.bankNavy,
+    color: '#FFFFFF',
   },
   list: {
     backgroundColor: Colors.surface,
@@ -66,6 +161,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
     overflow: 'hidden',
+    marginBottom: 16,
   },
   logRow: {
     flexDirection: 'row',
@@ -109,5 +205,12 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 12,
     color: Colors.textMuted,
+  },
+  auditNotice: {
+    fontSize: 11,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    lineHeight: 16,
+    marginTop: 8,
   },
 });

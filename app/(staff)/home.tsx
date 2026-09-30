@@ -13,6 +13,16 @@ export default function StaffHomeScreen() {
         <Text style={styles.branchTitle}>Depok Branch</Text>
       </View>
 
+      <View style={styles.operatorBar}>
+        <View style={styles.operatorAvatar}>
+          <Text style={styles.avatarText}>RK</Text>
+        </View>
+        <View style={styles.operatorInfo}>
+          <Text style={styles.operatorName}>Rina Kusuma</Text>
+          <Text style={styles.operatorRole}>Teller Officer • Counter 03 (Active)</Text>
+        </View>
+      </View>
+
       <View style={styles.counterCard}>
         <Text style={styles.counterHeading}>Counter 03</Text>
 
@@ -31,11 +41,29 @@ export default function StaffHomeScreen() {
         </View>
 
         <Button
-          title="OPEN COUNTER"
+          title="OPEN COUNTER CONSOLE"
           size="lg"
           onPress={() => router.push('/(staff)/queue')}
           style={styles.openBtn}
         />
+      </View>
+
+      <View style={styles.metricsCard}>
+        <Text style={styles.sectionTitle}>TODAY'S COUNTER SUMMARY</Text>
+        <View style={styles.metricRow}>
+          <View style={styles.metricCol}>
+            <Text style={styles.metricNum}>14</Text>
+            <Text style={styles.metricDesc}>Served</Text>
+          </View>
+          <View style={styles.metricCol}>
+            <Text style={styles.metricNum}>4.8m</Text>
+            <Text style={styles.metricDesc}>Avg Time</Text>
+          </View>
+          <View style={styles.metricCol}>
+            <Text style={styles.metricNum}>1</Text>
+            <Text style={styles.metricDesc}>Skipped</Text>
+          </View>
+        </View>
       </View>
     </Screen>
   );
@@ -44,11 +72,10 @@ export default function StaffHomeScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 24,
-    justifyContent: 'space-between',
     flexGrow: 1,
   },
   header: {
-    marginBottom: 40,
+    marginBottom: 16,
   },
   bankName: {
     fontSize: 11,
@@ -62,14 +89,53 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: Colors.bankNavy,
   },
+  operatorBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginBottom: 16,
+  },
+  operatorAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.bankBlueLight,
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: Colors.bankBlue,
+  },
+  operatorInfo: {
+    flex: 1,
+  },
+  operatorName: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: Colors.bankNavy,
+  },
+  operatorRole: {
+    fontSize: 12,
+    color: Colors.textMuted,
+    marginTop: 1,
+  },
   counterCard: {
     backgroundColor: Colors.surface,
     borderRadius: 16,
-    padding: 28,
+    padding: 24,
     borderWidth: 1,
     borderColor: Colors.border,
     alignItems: 'center',
-    marginBottom: 'auto',
+    marginBottom: 16,
   },
   counterHeading: {
     fontSize: 32,
@@ -114,5 +180,37 @@ const styles = StyleSheet.create({
   },
   openBtn: {
     width: '100%',
+  },
+  metricsCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  sectionTitle: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.textMuted,
+    letterSpacing: 1,
+    marginBottom: 12,
+  },
+  metricRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  metricCol: {
+    alignItems: 'center',
+  },
+  metricNum: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: Colors.bankNavy,
+  },
+  metricDesc: {
+    fontSize: 11,
+    color: Colors.textMuted,
+    marginTop: 2,
   },
 });

@@ -6,7 +6,7 @@ import {
   ViewStyle,
   Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Colors } from '../constants/colors';
 
@@ -23,8 +23,19 @@ export const Screen: React.FC<ScreenProps> = ({
   style,
   contentContainerStyle,
 }) => {
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top,
+          paddingLeft: insets.left,
+          paddingRight: insets.right,
+        },
+      ]}
+    >
       <StatusBar style="dark" />
       <View style={styles.centerContainer}>
         <View style={[styles.innerResponsiveContainer, style]}>
@@ -43,12 +54,12 @@ export const Screen: React.FC<ScreenProps> = ({
           )}
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
     backgroundColor: Colors.background,
   },
